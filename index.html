@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open CAD Library</title>
+<meta name="description" content="Open-source library of public FTC and FRC robot CAD: full robots, drivetrains, intakes, claws, slides, turrets and shooters on Onshape, Fusion 360, GrabCAD and Google Drive.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE: a working engineer's tool, calm and exact, built to be used mid-season.
+   IDEA: an engineering parts catalogue: drawing-sheet paper, part numbers, a title block.
+   PICTURE: the catalogue itself; each card carries a small line drawing of its mechanism.
+   COLOUR and TYPE: white sheet, graphite ink, one signal red; Archivo 800 titles, Archivo body.
+   LAYOUT: title block band, filter rail left, card grid right; rail folds into a drawer on phones. */
+:root{color-scheme:light dark;
+--bg:light-dark(#ffffff,#111214);--sheet:light-dark(#f4f4f1,#1a1b1e);--ink:light-dark(#16171a,#ecebe6);
+--mute:light-dark(#5d6066,#a2a4a9);--line:light-dark(#d9d9d4,#2e3034);--red:light-dark(#d6361b,#ff6a4d);
+--redink:#fff;--chip:light-dark(#ecece8,#25262a);--draw:light-dark(#2b2d31,#cfd0cc)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Archivo,system-ui,sans-serif;overflow-x:clip}
+a{color:inherit}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+.band{padding:clamp(20px,3vw,40px) max(4vw,16px)}
+.wrap{max-width:1320px;margin:0 auto}
+header.band{background:var(--sheet);border-bottom:1px solid var(--line);padding-bottom:0}
+.tb{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:18px;align-items:center}
+.logo{width:52px;height:52px}
+h1{font-size:clamp(28px,4vw,44px);line-height:1.05;margin:0;font-weight:800;letter-spacing:-.02em;text-wrap:balance}
+.sub{color:var(--mute);margin:6px 0 0;max-width:62ch}
+.acts{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.btn{min-height:44px;padding:0 16px;border-radius:6px;border:1px solid var(--line);background:var(--bg);cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:8px;text-decoration:none;white-space:nowrap}
+.btn.pri{background:var(--red);border-color:var(--red);color:var(--redink)}
+.btn.icon{width:44px;padding:0;justify-content:center}
+.tabs{display:flex;gap:4px;margin-top:22px}
+.tab{min-height:44px;padding:0 18px;border:1px solid var(--line);border-bottom:0;border-radius:8px 8px 0 0;background:transparent;cursor:pointer;font-weight:600;color:var(--mute)}
+.tab[aria-selected=true]{background:var(--bg);color:var(--ink);position:relative;top:1px}
+.tab b{font-weight:500;color:var(--mute);margin-left:4px}
+main.band{padding-top:24px}
+.lay{display:grid;grid-template-columns:260px minmax(0,1fr);gap:32px;align-items:start}
+aside{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto;padding-right:4px}
+fieldset{border:0;margin:0 0 20px;padding:0}
+legend{font-weight:700;font-size:14px;margin-bottom:8px}
+.search{width:100%;min-height:44px;font-size:16px;padding:0 12px;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+.opt{display:flex;align-items:center;gap:10px;min-height:34px;font-size:15px;cursor:pointer}
+.opt input{width:18px;height:18px;accent-color:var(--red);margin:0}
+.opt span{flex:1}.opt em{font-style:normal;color:var(--mute);font-size:13px;font-variant-numeric:tabular-nums}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.count{color:var(--mute)}.count b{color:var(--ink)}
+.sel{min-height:44px;padding:0 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);font-size:16px}
+.filt{display:none}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.card{border:1px solid var(--line);border-radius:10px;background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
+.pic{position:relative;aspect-ratio:16/10;background:var(--sheet);border-bottom:1px solid var(--line);
+background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:20px 20px;background-position:-1px -1px}
+.pic svg{position:absolute;inset:12% 18%;width:64%;height:76%}
+.pno{position:absolute;left:10px;bottom:8px;font-size:12px;color:var(--mute);background:var(--sheet);padding:0 4px;font-variant-numeric:tabular-nums}
+.fav{position:absolute;right:8px;top:8px;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--bg);cursor:pointer;display:grid;place-items:center}
+.fav svg{position:static;width:18px;height:18px}
+.fav[aria-pressed=true] path{fill:var(--red);stroke:var(--red)}
+.body{padding:14px 14px 12px;display:flex;flex-direction:column;gap:10px;flex:1}
+.card h3{margin:0;font-size:16px;line-height:1.3;font-weight:700;overflow-wrap:anywhere}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tg{font-size:13px;padding:2px 8px;border-radius:4px;background:var(--chip);white-space:nowrap}
+.tg.s{background:transparent;border:1px solid var(--line)}
+.tg.p{background:var(--ink);color:var(--bg)}
+.more{color:var(--mute);font-size:13px}
+.foot{margin-top:auto;display:flex;justify-content:space-between;align-items:center;gap:8px;padding-top:4px}
+.plat{font-size:13px;color:var(--mute);display:flex;align-items:center;gap:6px}
+.plat i{width:8px;height:8px;border-radius:50%;display:inline-block}
+.go{min-height:40px;padding:0 14px;border-radius:6px;background:var(--red);color:var(--redink);font-weight:600;font-size:14px;text-decoration:none;display:inline-flex;align-items:center;white-space:nowrap}
+.res .pic{aspect-ratio:auto;height:64px;background-image:none}
+.res .dom{font-size:13px;color:var(--mute);overflow-wrap:anywhere}
+.empty{padding:48px 16px;text-align:center;color:var(--mute);border:1px dashed var(--line);border-radius:10px}
+footer.band{border-top:1px solid var(--line);color:var(--mute);font-size:14px;background:var(--sheet)}
+footer p{margin:4px 0;max-width:80ch}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);padding:24px;width:min(560px,94vw)}
+dialog::backdrop{background:rgb(0 0 0/.45)}
+dialog h2{margin:0 0 4px;font-size:22px}
+dialog label{display:block;font-size:14px;font-weight:600;margin:12px 0 4px}
+dialog input,dialog select{width:100%;min-height:44px;font-size:16px;padding:0 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cats{display:flex;flex-wrap:wrap;gap:6px}
+.cats label{margin:0;font-weight:500;font-size:13px;display:flex;gap:6px;align-items:center;padding:4px 8px;border:1px solid var(--line);border-radius:4px;cursor:pointer}
+.cats input{width:auto;min-height:0}
+pre{background:var(--sheet);border:1px solid var(--line);border-radius:6px;padding:10px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;margin:12px 0 0}
+.dact{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
+.note{font-size:13px;color:var(--mute);margin:8px 0 0}
+@media (max-width:860px){
+ .lay{grid-template-columns:minmax(0,1fr)}
+ aside{position:fixed;inset:0 auto 0 0;width:min(320px,88vw);max-height:none;background:var(--bg);z-index:20;padding:20px;border-right:1px solid var(--line);transform:translateX(-105%);transition:transform .2s}
+ aside.open{transform:none;box-shadow:0 0 0 100vmax rgb(0 0 0/.4)}
+ .filt{display:inline-flex}
+}
+@media (max-width:600px){.tb{grid-template-columns:auto minmax(0,1fr)}.acts{grid-column:1/-1;justify-content:flex-start}.grid{grid-template-columns:minmax(0,1fr)}.row{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){aside{transition:none}}
+</style>
+</head>
+<body>
+<header class="band">
+ <div class="wrap">
+  <div class="tb">
+   <svg class="logo" viewBox="0 0 52 52" aria-hidden="true"><rect x="1" y="1" width="50" height="50" rx="8" fill="var(--red)"/><g fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"><path d="M26 10 40 18v16l-14 8-14-8V18z"/><path d="M12 18l14 8 14-8M26 26v16"/></g></svg>
+   <div>
+    <h1>Open CAD Library</h1>
+    <p class="sub">Public FTC &amp; FRC robot CAD shared by teams. Filter by season or mechanism, then open the files in Onshape, Fusion 360, GrabCAD or Google Drive.</p>
+   </div>
+   <div class="acts">
+    <button class="btn filt" id="openFilt" type="button">Filters</button>
+    <button class="btn icon" id="theme" type="button" aria-label="Toggle dark mode" title="Toggle dark mode"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M16.5 12.2A7 7 0 0 1 7.8 3.5a7 7 0 1 0 8.7 8.7Z"/></svg></button>
+    <button class="btn pri" id="submit" type="button">Submit to library</button>
+   </div>
+  </div>
+  <div class="tabs" role="tablist">
+   <button class="tab" role="tab" id="t-cad" aria-selected="true" type="button">CAD files<b id="n-cad"></b></button>
+   <button class="tab" role="tab" id="t-res" aria-selected="false" type="button">Resources<b id="n-res"></b></button>
+  </div>
+ </div>
+</header>
+
+<main class="band">
+ <div class="wrap lay">
+  <aside id="rail" aria-label="Filters">
+   <fieldset><label class="opt"><input type="checkbox" id="favOnly"><span>Favorites only</span></label></fieldset>
+   <fieldset><legend><label for="q">Search</label></legend><input class="search" id="q" type="search" placeholder="Robot, team number, mechanism…" autocomplete="off"></fieldset>
+   <fieldset id="f-prog"><legend>Program</legend></fieldset>
+   <fieldset id="f-season"><legend>Season</legend></fieldset>
+   <fieldset id="f-cat"><legend>Category</legend></fieldset>
+   <fieldset id="f-plat"><legend>CAD platform</legend></fieldset>
+   <button class="btn" id="reset" type="button">Clear all filters</button>
+  </aside>
+  <section aria-live="polite">
+   <div class="bar">
+    <div class="count" id="count"></div>
+    <label>Sort <select class="sel" id="sort">
+     <option value="new">Newest season first</option>
+     <option value="old">Oldest season first</option>
+     <option value="az">Title A–Z</option>
+     <option value="za">Title Z–A</option>
+     <option value="lib">Library order</option>
+    </select></label>
+   </div>
+   <div class="grid" id="grid"></div>
+  </section>
+ </div>
+</main>
+
+<footer class="band">
+ <div class="wrap">
+  <p>Open-source and community-maintained. Every design belongs to the team that published it; this site only links to their public files.</p>
+  <p>Link index first compiled at <a href="https://www.cadbaseftc.com/">cadbaseftc.com</a> by FTC team 31071 Stratos. To add or fix an entry, use “Submit to library” and send the generated line as a pull request to <code>data/library.txt</code>.</p>
+ </div>
+</footer>
+
+<dialog id="dlg">
+ <form id="sf" method="dialog">
+  <h2>Submit to library</h2>
+  <p class="note">Fill this in to generate an entry line, then add it to <code>data/library.txt</code> in a pull request.</p>
+  <label for="s-title">Title</label><input id="s-title" required placeholder="e.g. 12345 Decode Robot">
+  <label for="s-url">Public CAD link</label><input id="s-url" type="url" required placeholder="https://cad.onshape.com/documents/…">
+  <div class="row">
+   <div><label for="s-kind">Type</label><select id="s-kind"><option value="">CAD file</option><option value="R">Resource</option></select></div>
+   <div><label for="s-prog">Program</label><select id="s-prog"><option value="">FTC</option><option>FRC</option></select></div>
+  </div>
+  <div class="row">
+   <div><label for="s-season">Season</label><select id="s-season"></select></div>
+   <div><label for="s-plat">Platform</label><select id="s-plat"></select></div>
+  </div>
+  <label>Categories (first ticked = primary)</label><div class="cats" id="s-cats"></div>
+  <pre id="s-out">Fill in the title and link to see the entry.</pre>
+  <div class="dact"><button class="btn" type="button" id="s-close">Close</button><button class="btn pri" type="button" id="s-copy">Copy entry</button></div>
+ </form>
+</dialog>
+
+<script id="lib" type="text/plain"># kind|title|url|program|season|tags|platform
+# kind: blank = CAD, R = resource. url "~" = https://cad.onshape.com/documents/
+# program blank = FTC. season: B Biobuzz, D Decode, I Into the Deep, C Centerstage, P Power Play, F Freight Frenzy, S Skystone, U Unspecified/Offseason
+# tags: base-36 index into CATEGORIES (first = primary). platform: o Onshape, f Fusion 360, g GrabCAD, d Google Drive, x Other
+|Undershooter|~965b8384dc27bc27ebb5c92d/w/a3812c5ab6e93aeb85ff4c47/e/db680d6b4bdd71c5704e35f0||B|89|o
+|Polaris|~b5a139068ac8353239181286/w/dbe9e4718d26dd67d91d1af5/e/2e6d0962debec50d03a9560e||B|014789|o
+|Crêpe Release|~143cb861045cbdddd8c0feba/w/6d66aab782fd75f5b6057b17/e/0a7d39cc104c5c9f0680d6e8||B|01478a|o
+|Bitflip V1 Release|~311e7074d942f0567dca8747/w/0ca9b9601718a20f3ceddd6b/e/9e32ef4765607d91f417e043||B|014789|o
+|Biobuzz pollen Robot ¦ 25070 Talos|~5946d503ee37a0ac02193290/w/4f80ba17502276eff41696b0/e/f2125581bf6db6ea9e1f4e03||B|01478acd|o
+|Biobuzz robot by Drizzy|~374cd425e3bf5a9555f301d2/w/c979da7eea24c80e7e30bff8/e/9b950a4672c3d58434dad9e2||B|01478a|o
+|18365 Biobuzz V1 Robot|~4dd01dd6042d4fc462d78595/w/c42abfaad1c87561d13deb55/e/98f836d8f01cbba581ad950f||B|014678ad|o
+|Meta Decode Public Release|~344d02ecb1340ed36c536a93/w/5f2faf234f9997a5a0ff2537/e/07b61df70521ddde8023743d||D|01478|o
+|ROBOT V2 ¦TALOS EDUROBOTS #25070¦|~61ec43f7ba5c46386ea116b5/w/23de47e4f9ad796273029a01/e/c4b82a9c30b31170a93e19a2||D|04678d|o
+|Gripper biobuzz|~af616fdc024a0fb50dfce7ca/w/84d079814acf293047151d07/e/25abd44cf4d141993cd9edb4||B|5|o
+|18365 CC Chain Reaction Submission|~70114baf602d95a618c3fcb7/w/3a762e3e89f961427c896f8a/e/65fc20eda99cec99a1f0bee2||D|04678e|o
+|VCC #5|~18b37cdc3de0199f4d2dca23/w/3f2da1596472b3174473054e/e/0c5478a4b66ea55078cb5996||U|0478|o
+|Freight Fight Bot|~a1ad1baff0ae2f16c2bdcbfc/w/1dfdde712431ff6906c06d81/e/43cbe72709937cfeb97c41ec||U|047d|o
+|Poppy MTI final.step|~ecc71c6b26b43f044d4b2589/w/a43082b1875fd38bd5f9bcd2/e/83bd8eba2133596a2717cfac||U|046|o
+|3dp gobilda drive train|~ae8b51897ac1ee60a604bc5c/w/ee9110f34f839a406dce1fff/e/8c3900d7298ed55d9f7bc529||U|e|o
+|3D Printed GoBIDLA Drivetrain - AUTODESK FUSION|https://toastgeeks.autodesk360.com/g/shares/SH30dd5QT870c25f12fc8763d1dcad171b1c||U|e|f
+|Stegorocktopus|~27a940c5b8442c57d78c6d1c/w/9b53bf1cb9b4affe7f0c2654/e/6fbe8152fd22fd4652e6ff7e||U|04568|o
+|Off Season Grind Cooking|~c20a14749b1d4c35a13aa4df/w/3f17b59e4521afb2ecd9e7a8/e/87bff81d02f18289d19b3352||U|67|o
+|Centerstage Robot|~fba422c04d9f259e36433b8c/w/661ed7aa8a40b6c0f5d26203/e/6205d0d7691937476f4d9a4c||C|03456d|o
+|Main|~de8c92cd445042db40e199f4/w/fc19583bca06791c27f6a098/e/0295de739e91096f0e48547d||U|0456|o
+|Overtime|~9a35a3cd5c7bf3887411e3f2/w/a38ca490d90311a233ed7e1f/e/c33e77258de8bc435d92ef2b||U|056|o
+|Retux|~dc926690b497aa8bfbf56815/w/9c7ae41fa008b69e446a0658/e/11a2382d6c5f5e06ceb7b4ae||U|046|o
+|States Championship Robot|~cb5a71f8ee840a44c9b64950/w/93872ec401ee520e885f2128/e/9eb2c711d6dd34f1b3ef24dc||U|046|o
+|Tux|~b6d7df8d0cc480bc5d39388f/w/3388fbe6eb81b2fa84e0f4ad/e/7fa73affd68de81d910b3382||U|056|o
+|V1 - Ostrich|~6896898cfc069f0ebf9d79f4/w/ae638baa1d91b70048c99ad2/e/9dd2b8dc2bdca083284dce02||U|0|o
+|Fishu Nationals Version|~a868b127f98cd1f889513c09/w/941765e201c3b0075475b4b4/e/e207c989f7cc404109022e3f||U|46|o
+|Centerstage Robot Public Copy|~d4c1120a81a463601203aa93/w/7dff619eb7b759df292c973a/e/71eabe9badf6bb3292af045a||C|0|o
+|FRC 2910, 2023 Top Level Robot|~28a885d3b8ad7de567efebbd/w/33b7dd39d54ec1ab15f2e2aa/e/3a56292a14fcabb1906c6575|FRC|U|0|o
+|Centerstage Robot - 16481|~b59528b1122785b45909720e/w/6059abdf7b0baa2aa85792ca/e/afd8c7ea2de9426740bab2e6||C|0|o
+|Project Mosaic Runner 400|~10b30c532e141096e919012a/w/4531859bbec793b4f8822232/e/9cf08cba415e3c046249d83d||U|0456|o
+|Regionals MK1 Drivetrain|~c6b0787474ed333ac09b708a/w/13c05efad11ca1aa42179ebb/e/af16f9683657281d9b4e63cd||U|46|o
+|Retux|~dc926690b497aa8bfbf56815/w/9c7ae41fa008b69e446a0658/e/ac3bc60b0453006cd95509a1||U|046|o
+|Sedulous|~848543f5be303747fcdbbc37/w/28cf74b13b101bb61676c42e/e/60b98b18d4c9cf43f41a5766||U|05|o
+|QR-23-A-0000.STEP|~adf30002dbdea35579ba2d6c/w/b75e981b1f57d5d7fa8ddb83/e/61c6b1ba59bad5cf1d0db96b||U|06|o
+|Skystone Swerve (Incomplete)|~7b0c5fc17ec3c2db8e56136f/w/24f09cff7077fd2a80e72dd5/e/2404ab8a177d91fea5d8073a||S|35|o
+|Slingshot|~3528cc738ba38e0aaea6903e/w/6f8623efe434d494794db191/e/d4fd1e2ef97ea5aab97af003||U|046|o
+|Poppy MTI final.step|~ecc71c6b26b43f044d4b2589/w/dba69789ab8ec0be6c446689/e/83bd8eba2133596a2717cfac||U|046|o
+|adir.stp|~e2f5d2df1f518a2896ae5f05/w/ecd7c37fa777cc0e7e549c5a/e/c5420ea24ed19c2583c7e7c5||C|0|o
+|FTC 23511 - Into the Deep Robot CAD|~ae5ff79658ff2a51ece82558/w/1babafd80652d7e5216f214c/e/548f3b6bbedc29b9264b1a15||I|0456|o
+|Depth Charge v1|~c034e8ec1d794fa1252d615b/w/34a59f16061882cf9d58ac2e/e/e7c3a073e473b372a02fc9db||U|3456|o
+|Worlds2024|~01724470971689e69f76ad50/w/530563531b367ad5efe8e8ac/e/eaa30a91da6df5ce249efcc5||U|05|o
+|Velox Cad Challenge - Skystone swerb bot|~3a80a9fc88b4fb73bd2ccfe5/w/ad061d82580ae727ff864b60/e/5f73eb7c417b3f445092c0af||S|3045|o
+|Depth Charge V2 view|~d0d8503083cb37a130dff16c/w/1871c17d3c7024ef89683682/e/25bc4d73918cbccca8052f20||U|3456|o
+|Orca|~d2a761d1667a8220e48ec838/v/d666c8e587965b23325a4a30/e/e57740242c43a75198d9f31b||U|03456|o
+|Into the Deep 16460|~e364eb81a211d8677faa51ee/w/0dc5db72e35032ccb09cf4b4/e/4ea1db08d46508fa5068798e||I|0567b|o
+|Leviathan 2024-2025 Robot|~a6c8b6ab5653c8c43858de66/w/38c86f3a56f54abfae6c7d07/e/a3cd7b8ede0eb3b17b2b0619||I|0456d|o
+|Hydra Shadow - AUTODESK FUSION|https://waukeeschools281.autodesk360.com/g/shares/SH286ddQT78850c0d8a43790b8e045346fd9||U|0|f
+|Clip Bot|~fd162b349fb5da1163ee2a2f/w/1b395ae1720bca76c2a9665f/e/408edd45bfce65fc782f371c||U|04567d|o
+|Gear Wizards CAD ITD|~b49bca9920574f49b8f56cf7/w/e5d61f90a57f7a409b498e0e/e/9483c70ce1619f1b637cdd0e||I|06|o
+|VORTEX 18603 V6|~84d506ff974b27472f33b7e6/w/88b08b8ae76a31fc77f1dba4/e/21ee8744f0b4a57d3cde22e5||U|0456|o
+|Into the deep robot v4|~a7b1da28b8e3acfcd89bb139/w/8f3e036bd754c5930541ff59/e/373937afed146b3a8e324c90||I|0456|o
+|19099 H-tech Into the deep 2024-2025|~18cc9d3a13c866836698a83a/w/d1e7fe8ff66427aa2c3db61a/e/7dd6a4eea9404e1e4e5e449b||I|0456b|o
+|Extendo v3|~bd781072191b4b771db8b158/w/dfab11907603d3a720c139d5/e/c56793fe25e93a1aa37a756d||U|6045|o
+|4410 V2 Bot - Open Source - INTO THE DEEP|~b45812c85d21023efcbf09db/w/618707eeb2b2fc16ebb67ad0/e/5980edb3c5a07d2dd770b96c||I|06b|o
+|Centerstage Robot|~fba422c04d9f259e36433b8c/w/661ed7aa8a40b6c0f5d26203/e/6205d0d7691937476f4d9a4c||C|03456d|o
+|18270 RoboPlayers - Into the Deep|~aebaa3ef6903293b21871485/w/9412eeae3624fe42ce363cc1/e/6d81e58ad25a991a5d27d1b4||I|0|o
+|finalfinalfinal - AUTODESK FUSION|https://kristindesign.autodesk360.com/g/shares/SH30dd5QT870c25f12fca60054fa3edfa78a||U|0|f
+|newmecha - AUTODESK FUSION|https://kristindesign.autodesk360.com/g/shares/SH30dd5QT870c25f12fcef00dc59b819630d||U|0|f
+|LSCC 2023|~ca4657319b95ef72f9074b9e/w/0629beab8e92135e193b0734/e/79b3d849f93cd7b013fff1e8||U|046|o
+|Depth Charge v2.3 MTI|~d448959900b89abcdc0dd296/w/53b1d5727de7ea437ab467a7/e/9aa6cceef77dede23125b6ca||U|3456|o
+|Peterbot|~ef0873a73aee61d132c959ee/w/d3052f91b61f14038be326ea/e/de978805576a84432efb0e1e||U|0|o
+|19099 H-tech Centerstage 2023-2024|~e61e709112233f8e702d98b8/w/ac7eb045b7721630c977ae3f/e/16e5964ad769469487e552e9||C|046|o
+|Centerstage 16460 v2|~ce604d35757321522214511f/w/5d51be36907aff463fe6b97b/e/3846f257c66cdb4ca7bd9e1d||C|04567|o
+|Gortimus Prime Public|~e5d5a1617081e36f55160efa/w/67e465f2845815b98dfd1281/e/c8b022e701810e22b4ac7c4f||U|056bd|o
+|UFORCE-Final - AUTODESK FUSION|https://uniqueroboticsedu4.autodesk360.com/g/shares/SH286ddQT78850c0d8a44a0ff6ffce5b1605||U|0|f
+|Atlas V1.4 FIXED|~eceb4f320b01763ba1e8a125/w/78d75f34b66502c5c114b17f/e/c39839ee9c33afecf75ca0b6||U|0456|o
+|Peru's Bonsai Tree|~07e2a771765f481faf0332d9/w/6eacb231ab6689530e51f2e8/e/a4b1c9a81264f61229e94586||U|04|o
+|Droid Force CRI V3|~1251b706b26e366c8ec473c1/w/05d6959f2befb4ee85d700e2/e/16ba5df9ff77e2512be2524b||U|04567b|o
+|Caesar Circuitry ITD OA|~cf533bb8c8240c95e41a2fee/w/2bb5a6848b6905cb05e5da11/e/d904bd552471b4afe760ec98||I|0456|o
+|Fishu-MTI - AUTODESK FUSION|https://gmail2376016.autodesk360.com/g/shares/SH286ddQT78850c0d8a45d7c47fcb0ba09ef||U|0|f
+|Cosmobots 2025 PUBLIC - AUTODESK FUSION|https://gmail3131273.autodesk360.com/g/shares/SH30dd5QT870c25f12fc54328a1af4859d46||U|0|f
+|Centerstagev5|~2d9e2d3acf4c7b673683e68f/w/2412ee4f340e2f19b28f1545/e/81a04659f8eb36d0b8edaa5f||C|0|o
+|2023 FTC |https://grabcad.com/library/2023-ftc-power-play-cad-team-11329-i-c-e-robotics-glacier-1||P|0|g
+|2023-4 Centerstage Avalanche|https://grabcad.com/library/2023-4-centerstage-avalanche-1||C|0|g
+|Assembly - AUTODESK FUSION|https://mygo4455.autodesk360.com/g/shares/SH286ddQT78850c0d8a487cd522a350dac06||U|0|f
+|Nautilus|~8b9c71ef444b0ca656b77248/w/6408dc3be6975f56ecf4b94c/e/6fd499479be35b74682dfd6f||U|456|o
+|Vortex MTI|~614f05e03cd8a302e60e2695/w/b525bfffaacacfcf49e5f733/e/e285ce0031eedb27cb70d4e1||U|04|o
+|Side project because i am not happy with first one|~65d5af35234428dc895923ca/w/3aba70a3356161af354b40fc/e/19ef76f3db05f86bf71944c2||U|0456b|o
+|Runtime Terror Into the Deep CAD Release|~986b112f37ffc7b6a9a148dd/w/0a7fe44f80ef1b0fe42410b2/e/c04d261dc6031253e6ab6f9d||I|037b|o
+|7244 - Orca|~ba851617342299fb8e53070c/w/4a32293ea480099d29079735/e/20582283e17d91a78dfdf795||U|0|o
+|WARTORTLE_public|~fb58eab2c25458ad933ce1ad/w/fac8ceaf8ff79f8acff968ff/e/fe16800ee19a503c9b677c74||U|0|o
+|Master-11329|~06c0c40a16700e096c4925ce/w/befd551146d7cff3f6dc3d95/e/f9601bac2cb91c444f5e1ef1||U|0456d|o
+|new bot|~af7b12daa5b25088172d92b6/w/89065d01b539446ab4e53fa9/e/02cc71eb915a3a2956602538||U|0456d|o
+|NOVA|~eb9c14534b1b05584bc0b74c/w/6e153b49df2d408482e790c7/e/0ce60ad6a06662b3d3fccc02||U|05|o
+|Centerstage v3 - Curtain Call|~c36959cf75007029bf0ea158/w/75b619e8364843941660f609/e/a03d853f1c0f9d416e9b49db||C|0456|o
+|RKA PP-ITD Cad - Google Drive|https://drive.google.com/drive/folders/1skZ63jai9W9S2zE0deBhhvIrPURic-bZ||I|0|d
+|Sandstorm 2.0 - BLACKOUT|~ecaa1d6ee547cb13f4d7c6c8/w/7030465b4f9aa01947cbd7ac/e/2fd3c1943c98a5ab4d4bcbee||U|056b|o
+|Ri16H 19049 High Five Robotics|~0fe8093be8ba9699087bd8ba/w/4d9ae0a9d66ac059b409bfd0/e/3b8190ec786a7815d43421ab||U|0|o
+|FTC 23511 - Decode - Robot CAD|~c021b03986672773c2100272/w/74f0a8f10b4c93fb8fe556c1/e/b8bffd930c2a2d8248794936||D|034678|o
+|16750 Decode Robot - Copy|~66d8ec7c26d21a233fa88286/w/a41788a049c87903ec8c1c8a/e/664379d2c4f3470de315f332||D|08|o
+|00_FTC_Everybot_25-26|~6b009ac2fe8cd5493a91dc53/w/6d6954e67072f79309813086/e/4c713f6d2f44a330e30b2a79||U|04|o
+|ironsides 2025|~72887ca49cc7974587b84421/w/15e6ff7b966c710cb5f0980f/e/9c0cc186af161ec4f157308b||U|0568|o
+|teamwork makes the dreamwokr ngl|~0f5bdcbcb4e2b43d2fd9fb01/w/77fa0f6433e4bee37976946a/e/037acc89fe11f6fdb11b63a7||U|0478|o
+|leagues bot|~d17228c106fb3302f39929c8/w/9f23bd5fc4825d0111028363/e/6b0c97f8822fa285152741a3||U|0|o
+|18365 25-26 Decode Robot Cad|~a489cb1ebea689ba39a0e0ff/w/a635b0f2aeed8f2ed6a09fec/e/c1d56dc33c6ea9de248c4609||D|048|o
+|Cuttlefish Robotics #31663 - FTC Decode Robot CAD (Flint Meets)|~b67d43fa5105473601cd4008/w/21ca1d0275e6574b7c92d32f/e/4df53f5d43e36e04d45bcb83||D|0|o
+|22261 V2|~02ded48c13b55e27c73f95d4/w/e2890b20eb4d33209ed6d4bb/e/3390ed48e5542b2a0c149bb7||U|0478c|o
+|RSR Cuttlefish #31663 - League Tournament Robot ('25-26)|~47ca6e8f34bfeede509312d9/w/3fdf7b2f2fbe58fc379ea05e/e/7a407a6b6335bb65ed7a40c8||D|0478cd|o
+|leagues bot|~d17228c106fb3302f39929c8/w/245704562f34caa092685a01/e/6b0c97f8822fa285152741a3||U|07|o
+|FTC DECODE FINAL ROBOT (NATIONALS)|~02776f9cf6799ddf7b5ab70c/w/ce5619b75c0578445edd90ca/e/77e506d9306cb71d4838b9d2||D|04678d|o
+|decode v1|~9209bee78cb658cd8ebcb034/w/395c62d576519ae090829005/e/d957a553aec0ad375155f52a||D|0|o
+|Worlds Rebuild FRFR|~28474faf9545278ad82ce340/w/07b9ca49a97e2ee5b5d0951f/e/a7330a17c44c5c206f8f9b73||U|07|o
+|KHRONOS V2|~354d3fb34d064a68897f23de/w/3faa466a29ea87ee23ae83fc/e/06d8445569874121d4fbde02||U|0478d|o
+|Robot V4|~acdcc05339615eec7a0d6600/w/e5e5d966ab3c1567b00a9a7e/e/5d359ca2e63e162d48035685||U|07|o
+|Untitled robot|~7573300c60aec127cf587728/w/96f139eb25cbe55565a1fb2b/e/a7102a7ddccdcdd7951b32c4||U|0468d|o
+|Droid Force DECODE V2|~739cbc37d8c0f0ad7b95c0eb/w/fc70919e3f63577f145199d1/e/615c0c03deda030e370d37d2||D|0478d|o
+|RSR Cuttlefish #31663 - Full Robot CAD ('25-26)|~47ca6e8f34bfeede509312d9/w/3fdf7b2f2fbe58fc379ea05e/e/7a407a6b6335bb65ed7a40c8||D|0478cd|o
+|SIDEWINDER V2|~4bcad797de72dee12424b6b6/w/2509bb4d9cbbc180ec53ab91/e/b39eb44fc329fc01f33ee1cf||D|4678|o
+|Robot|~38e116182321d211ee66fe82/w/0791b230463bfac2d90f6ac7/e/67dbc8d0e96dd6f194f1a582||U|04|o
+|11444 DECODE States Robot - Open Source|~9f6bf00afa4ed4a5c20a3833/w/8361a7679cdc144834787c40/e/2713da6c43f075f3e58dfe73||D|0|o
+|DUGTRIO_public|~1cf2882d6cfccc771986090c/w/8fe42fcaeea70f5eb38f5ab8/e/c92871d549064e32c8f23842||U|0|o
+|[PUBLIC] V3 Robot - 4410 ARC Lightning - DECODE|~3c64272b9f6ee02d003cadb8/w/26d08a18f003668ff8acb955/e/46a57143f1a5bffe45e4daf5||D|0478c|o
+|Hails torm|~f5fefb77593ae89a9610f6e3/w/516b2d6568a54beec15e3bc9/e/8e4d101bf2d7bf50e14e08fe||U|0478d|o
+|FTC 12682 Decode State & League Champs PUBLIC RELEASE|~a0b70ff93e859bb39a4d1492/w/8047b2a50e25045280984935/e/fb89803e8b710c9e4cc37080||D|0|o
+|FTC 12682 Decode World Champs PUBLIC RELEASE|~404abd935a6517b17a9fd3f2/w/069c6f7f7b4de13faf52e88f/e/73b45e4dda499874eea772c4||D|0|o
+|2025-2026|~c9732b32d607504aef03ea69/w/cfd61b1589eb95aa23d03623/e/990a8e4221befd6ce438142a||D|047|o
+|Zenith [Worlds] - Public|~dec30ebc693f433983b8aa76/w/e369fb4495015a3ee5dc06f2/e/0bd1b8d7633556ab33fa96d6||U|04678bc|o
+|Theseus CAD - Google Drive|https://drive.google.com/drive/folders/1iCunTgvvz72l3Cce606oV0_lXFf8JOw0||U|0|d
+|rosette her? I hardly Know Her! - Copy|~333d4a2cc87b0e0d1d01d4a2/w/d6319f4e76e9fb9d0177b8d2/e/cb7a8efa183e69758c2eb3f9||U|048d|o
+|Fixed Worlds CAD - AUTODESK FUSION|https://mywi118.autodesk360.com/g/shares/SH90d2dQT28d5b602811ab4c037867c5542b||U|0|f
+|ORACLE 18603 V3|~eac524bc050f71647f3350ea/w/a4cf335b8f495daf694e8aec/e/298a7b6743386c8e5bc114af||U|0478c|o
+|SIDEWINDER V2|~61013b9bccef8a9e7eb0381e/w/3291d2369255b9a8fa5b32af/e/a7ba76584903831caf69e4e5||D|4678bc|o
+|30030 Decode CAD Release (ROHAN☆*: .｡. o(≧▽≦)o .｡.:*☆)|~68c34f2bee6f1d5591d531b4/w/0fc12d1b3cc3abd2046e3a05/e/8198f278050ab47d57ed6ae1||D|0|o
+|Worlds (Orion)|~1db73b272915b4389fd2b4f2/w/42ea8ea47f01fbbd5b07d59d/e/67756942bd7c4a6493af4b38||U|0|o
+|pinion gear pivot swerve - Public|~29a4901a1c82d6a0154efcb2/w/8ef38eee1a54f5c4e6f1b709/e/a3a3ffbdfb3267cd5deb6866||U|3|o
+|MTI|~5638a6f4b1fc234620fa0afc/w/b97f9acacf58add59b2c00d3/e/1b4fb1ced7d9374d71fe5fb5||U|0|o
+|INDEXER - AUTODESK FUSION|https://gmail2800803.autodesk360.com/g/shares/SH286ddQT78850c0d8a4cd5a63809e47fb77||U|8|f
+|Untitled document|~c5259c10461bbe34613c419c/w/7238ba9010a52d09640892ff/e/b9bedd086b04dbbfeaa31881||U|7|o
+|shooter share|~fed59f9d15c41b2a3e7fb23b/w/122c548d594b4e83a68ded57/e/d868b57a63be966194cd4b27||U|87|o
+|18365 26-27 BM Drivetrain|~88715d86e064c7229dffea91/w/4c11ef593b292ee5c637545a/e/ac21f3a978914e1e28048db9||B|e|o
+|Red Ring of Death: 2024-2025 Season|~37697f9e12c866601bb956d1/w/64bdcd69584e980a5359bec1/e/a254c83e3ab71d0f5b71068f||I|03456|o
+|Multi-use Chassis|~57a3e31c3c0aa57f56384f76/w/ea36248410c5c93c91e7de65/e/eba070d9119fe328db5b41e7||U|3|o
+|parallel Plate Chassis|~08116218738d70892612b3d0/w/75ee31b5fe069df46ae4cca1/e/329d0f2e0c2c535d770fcea5||U|e|o
+|Off Season Grind Cooking|~c20a14749b1d4c35a13aa4df/w/3f17b59e4521afb2ecd9e7a8/e/0f0130b3594255d769cae72e||U|e|o
+|12x12 ITD Bot v5 - AUTODESK FUSION|https://toastgeeks.autodesk360.com/g/shares/SH30dd5QT870c25f12fcd82cf0e820c8491b||I|0|f
+|Mecanum|~01f6a94192438e738c108519/w/0e994f2ab0b9cff166e0c3bf/e/66f6d553b493c14002b09c47||U|1|o
+|FTC Octocanum DT|https://grabcad.com/library/ftc-octocanum-dt-1||U|1|g
+|Offseason Robot?|~b0857b0cb8bbb29818d31710/w/e9ebfc64d57d4685aca0d31b/e/d96f0f6e6693f5f2a83f55d4||U|106|o
+|OPEN-TRAIN ASSEM EX.|~01672cef7e272016cf0d3207/w/c5a00666bb9e860d01390c8c/e/c6ff3583ac5fb17fe87e7aee||U|e|o
+|Custom Mecanum|~3b42642aa254a7dacc5fb37b/w/fbebaa4fc0e2002aabd6a593/e/30e6d2bee4165105fb13eb9a||U|17|o
+|OpenSource drivetrain|~9013dbab11e90bbe0c8748f0/w/8892b100e156bdb0ad2e6cb6/e/e328e0e79cb0d080f5c481e0||U|e|o
+|Configurable Drivetrain|~3e743d708bf476997e47ae29/w/7db504aa5aabcd074302f22c/e/6ed59e4fcf143976a403e602||U|3|o
+|21211 Differential Swervecanum|~028bfdb547f76bc1d1b4368e/w/43bc5da5a52fcce81d150247/e/40176472663b96be76a21f2e||U|3b|o
+|22489 GNCE Diamond - Bare Motor Drivetrain + Clutch Power Takeoff|~8dbb6ec5b64ba5d9556668ce/w/7242710ea56febb23e213c1a/e/cf81280e74517a36b814bdf1||U|b6|o
+|Clutch PTO Drive Train 23521|~afd85d1a16666e497ea446b5/w/82ad74582cfa1e70d2825864/e/6a8c63b5a9fb663709acc7fb||U|b|o
+|Master - Vertical Chassis|~972d8f9ea92b62c25b974f66/w/7ca33d3f50d5b54dec176c4d/e/1882ce4ae25225dd7c0b00e7||U|e|o
+|what the sigma drive(s)|~522f1bcf17d9362ac74a3ace/w/16bcae52eb0b57e612cfadc8/e/5bb3aa628455ce85477b3acf||U|e|o
+|Sohm's Parallel plate with PTO|~1f8b9f742963efcfa25f3c17/w/d526eaf47ffcf817f4835bf9/e/5d36e831fdadc86ee34613a7||U|b|o
+|Project Velox|~c606396fc576780ed64e2c64/w/20ac0e5442f70a7c37ef59bb/e/a8bf924fa3e70c6ac5f44289||U|e|o
+|23511 Swerve 2025|~ab96a69b9c31e9c21f8246c5/w/f1a74f6ac47569c9c5b2759a/e/cc3c1b6c568dd049df481772||U|3|o
+|swerve|~f6dd45713fc55340bdb74873/w/e9f391990ef2f46074982c1c/e/eecf4140ad487fdc4d6687d9||U|3|o
+|GSCC|~e6161993cc6dbd656f8d9fbf/w/373e340bd1af385977739ce4/e/229a92f69e352b227114e850||U|4|o
+|Final Swerb :O|~6ef85526b3c96cd3b0565958/w/37977f67ee13a3c89dafa0b3/e/a113334d323140da9f3b8920||U|3|o
+|FTC Swerve V19 [Space Optimized]|~2916b072b8043464cdb4d915/w/cbc217cafbbe284ffdc759bb/e/a166b6750c03a307c70eef5b||U|3|o
+|Public Robocorn Swerve 2023|~306251bafdc286acf23eae40/w/e977adb197797d0fd3ca0d33/e/b1403de6a7ef35cf74a86a35||U|3|o
+|Swerve Drive|~baa12ace38aa46a5d73ea601/w/0ac22dd3b399315de9fa2317/e/ee49bbfd7ea9ad5ede0b7cc2||U|3|o
+|Magnum Coax|~752ea71d3b59dd6c8bae4750/w/b7b003bd9a1398eecbfdd132/e/3fd544cd11349bb2dc71b458||U|3|o
+|#swervin|~ebc568d988a3481df5b30665/w/b52c4b20056239beb1b33c8a/e/a7b22d9de0a86190d96ba28b||U|3|o
+|#swervin|~ebc568d988a3481df5b30665/w/b52c4b20056239beb1b33c8a/e/f4c48ae027e27379d605a705||U|3|o
+|skytoneswerb|~c95752f4f13750fd64cdd50a/w/297379c13a7857598daebace/e/1c550c0f0838d3fddfac3fde||U|3|o
+|Project Velox|~c606396fc576780ed64e2c64/w/20ac0e5442f70a7c37ef59bb/e/2cd42b81089226238fcc11db||U|e|o
+|Trident_Swerve Pod - AUTODESK FUSION|https://gmail2690805.autodesk360.com/g/shares/SH286ddQT78850c0d8a43772d89064e6e753||U|3|f
+|swerve|~f6dd45713fc55340bdb74873/w/3bfef1b959380992db9ed91a/e/2240052c0851ca78f6c35538||U|3|o
+|Swerve Drive|~baa12ace38aa46a5d73ea601/w/0ac22dd3b399315de9fa2317/e/9f16609caf76e1879955cb28||U|3|o
+|Suspension Swerve Runtime Terror CAD Release|~ad162340268ee61625c10538/w/caf93cc14c1a1ac0ee158aa3/e/5ab9cd92e81e54ace1faa07f||U|346|o
+|Omni Swerve|~cb36f03e1f431e4fbc1611b8/w/b0d0f85201ef7ee26fb66306/e/b975b1c254eeceded9a96aaa||U|3|o
+|Alpha Lab 28333 Differential Swerve|~d72a464873bd3fc396ebfcf6/w/20a3ecead86060d864b45948/e/1fb8323d5aa7c8f731d740e1||U|3b|o
+|Moegleria Fowleri|~9454b91e0bfda69e982f2408/w/4ddf61a8cc4bac55b562751e/e/cf7c490f384bfedf22751a63||U|3|o
+|Intake|~02221aef8e65255bcbfa5530/w/61d07c17001126a33e8401aa/e/3255cb58592cde6a2e73cb9d||U|4|o
+|ITD Intake|~5acb35e975de9cbd2dd6b885/w/c8b3854a0d7c7044f9c40d00/e/264c8b0aef6d29999828e0e0||I|4|o
+|14259 Final Intake - Into the Deep|~518529e941b273f27e9d8039/w/45233f88a4aede2919693695/e/0aa7fedd09a3929ae2a3dd86||I|4|o
+|Active Intake Sample|~de6e02f834080e2594b4d3e9/w/ad64edbf9f2898e3cab7fc80/e/02f0a10a383c33c312c2c048||U|4|o
+|Intake|~8d1c255df69dc85edf651bdc/w/b12da3bfa2f6c17cac78e26f/e/14c3162339a6ba2e36836028||U|46|o
+|Project Mosaic Runner 400|~10b30c532e141096e919012a/w/4531859bbec793b4f8822232/e/4c5adc18dfc84eef0a90d8f0||U|4|o
+|Flappy bird|~a6afdbdd3460581e5ebd5bdf/w/76ddc6e02234d45182d40695/e/d4485b0e276b06ddcd42a330||U|0|o
+|Final Roller Intake (Public)|~899522a2ac1d0890bfbd86f6/w/a0646eaa3c29ce6feda99ede/e/b68c266ade06127721728012||U|4|o
+|Claw|~59a2f27a9e21bfcae7ab701d/w/3e4ce6e1276c7aae5b49f09f/e/34d6e0cb4b196ef375ec59d5||U|5|o
+|Sample Claw|~97b97f89fef678e45a025503/w/f5e5b8d4fbc73e4dc4c523a7/e/f6fc47a3e939ab7a454b554d||U|5|o
+|clawclawclawcalwpy|~c08eee6598af808a1ff3b7a1/w/8306f7ec0d38ffe294f917b5/e/7c8757815e7208b08d445d32||U|5|o
+|Claw|~59a2f27a9e21bfcae7ab701d/w/3e4ce6e1276c7aae5b49f09f/e/34d6e0cb4b196ef375ec59d5||U|5|o
+|PP-IN-B|~baff949549313a03dc76891e/w/0555d2fa2adeca3e6a8740dd/e/4cd009bf26ce868f238e739c||P|54|o
+|IntakeV2 - AUTODESK FUSION|https://gmail2194699.autodesk360.com/g/shares/SH30dd5QT870c25f12fcd982c6d4efaddbf6||U|4|f
+|DonutClaw [Open Source]|~2e5ebebe43c247d2291879a2/w/2564d9489293bfa6bdffefc9/e/33d929603717268545ab0c75||U|5|o
+|FTC 5390 Into The Deep: TeenyClaw|~7e3e404d5c332fdb8d5eafbe/w/dade19a56eecded9beaa5b69/e/7594f84a5f36c120b6c1175a||I|5|o
+|4410 opGripper|~3bbdad9160628f8e4ee9cd98/w/193b6db30793c3e0480bd580/e/715cf9067abf076eb8cd97db||U|5|o
+|sane claw open source adaptation (go bilda mount) - AUTODESK FUSION|https://utdallas392.autodesk360.com/g/shares/SH30dd5QT870c25f12fc95c34597d12f4039||U|5|f
+|Solvers Claw Into the Deep|~1c128ca169fe30eeb09acb36/w/48d3d3a7c87b50dc03cf4462/e/6130e80a0e8885dd47e5c9f1||I|5|o
+|Deposit|~2554fdd90795ff5dbc0fc911/w/a44601eba0df37698aea2e33/e/f812fff4a54b73a596974b21||U|e|o
+|Four Bar Selective Drop Claw|~52680c753e432fb640b0d09d/w/3388e0c4f378396ff6f357a1/e/814ca3b2c7cc9c7fa334f770||U|5|o
+|Linear Odometry|~9ae07698df16f89c5db4db15/w/78e10b681a52f79034216366/e/3c5ad0b9e569999c8432d26f||U|f|o
+|Boxtube v3 - AUTODESK FUSION|https://gmail2422025.autodesk360.com/g/shares/SH30dd5QT870c25f12fc8020356ebb0fde30||U|e|f
+|Slides|~1f5d7d406eb72f1df900c470/w/9e5e7f481cc649dc78db0d52/e/eaf80a824b28ad05b9807ddc||U|6|o
+|LIVE VS DEAD VS ZOMBIE|~2251a809d55003f84441fb55/w/6806eec02ea42e983f352d28/e/6dcab250ae7ec70c0a1d3b59||U|f|o
+|Mecanum with Pulley|~a0c79a79e3581cd078c25c0d/w/dd6de4f5aee46a85454d45f5/e/2005ae1d6e1dea46f807ff59||U|1|o
+|OpenSource dead axle|~2199bd6571bdf6858359f6a2/w/2fdb78fd5abbccfdedb1ab76/e/aedd82189cd78e2ee2881b43||U|f|o
+|30030 Simplified Grip Forces (configurable)|~0406b30e98571c0ecc7d85f4/w/5bea0ad9100f4044bc1e8e2e/e/aecfb6984a95009408d25bfe||U|e|o
+|CFDrone¦Tomahawk¦17315|~5cc3cde0cf8665eac1ac3225/w/a44e37d90b719924bf2a0bf6/e/704b31dd469edc4669963644||U|f|o
+|Drone Launching Mechanism v5|~44a6db3c85da741abb9b00e8/w/aa76279459366395bd4636d2/e/8d47c0c744aa3b2dcd1436f2||U|f|o
+|Spur Differential V4 (Public)|~dd924528db41d8c0146e3ed4/w/f93f649ed521739f4be82989/e/1a69bc790511b44263a82997||U|b|o
+|diffies!|~7e1529944cee2797a7500d91/w/d7daedda3c1b9f21885a8b8e/e/18eb49a64b7a87fe84ed30f4||U|b|o
+|Terrabats Camera Mount|~b482ef54a8453cb0f1ac268d/w/8ef8e6600d3afdd4b9ddeaf6/e/5b9a8b4cf4cc0974f3d11db7||U|f|o
+|PTO (Public).step|~bd5f0e795b190c791a4f05fc/w/60df71870b576673d2df6de9/e/eb2bab01b5659a3034c71a4c||U|b|o
+|QR-20-A-0200.STEP|~1f891ccb20eb07bd54bf7b6e/w/689dc2d9d561239126048573/e/eeb4f0044ddb715b8ea2689f||U|e|o
+|OP Team Plates|~bb659e5a67670989d44ad9b5/w/f5a2395d366ea3ce095cd118/e/b1ab5c5f91f4b48685ceb590||U|d|o
+|Magnetic Number Plate|~18cc345589cb155ca6629c93/w/9950265c722f1054b1f4047c/e/04491882bcdf29187c0ea6c4||U|d|o
+|Robot Sign Mounts + Example Signs - Google Drive|https://drive.google.com/drive/folders/1XgJVDvTVyJnElGbg-2T1W2ZYR210zX1U||U|d|d
+|Game Manual 0 Common Mechanisms|~45549489f570f3694569a2df/w/85ff26b9fca4988ebc4df3b4/e/05fbe7b65c6c4be0b0cddabb||U|2|o
+|fun 3dp pp dt|~58655dd9cc7cdd685ffc9c5a/w/4aafa0e2c731479b380a10e3/e/6ae04074f20624002c80b409||P|e|o
+|gb parallel plate chassis|~f58bf32c03c8ab294fb478ba/w/1c04372b4b799b12600c2465/e/6cf724f515c3787098382914||U|e|o
+|ftc ultra-hypercompact drivetrain|~c18be26e583108eca7ee4dbc/w/9d888c5911c6d5fa3e7f5ba5/e/64e8dd62ba9fd7a254d728fb||U|e|o
+|Baby Robot|~3a3440650ed8be6ec91f6a7f/w/c8234cfe8941adff9f276460/e/e54d0a20a0fd42b8b9ad263a||U|0|o
+|FF-DT-7LMEC|~8a22009546323d17e99ba385/w/c1d3e3839908942cc54e8bd0/e/64ad5467c7425d2d2c8a00da||F|e|o
+|Lmec v2 - Copy|~1894e54e73032efad4808062/w/4e72742885fef852cf186808/e/643604064b7181a99ee7400a||U|1|o
+|Lmec v3 moment|~d07cff73ed43d42e6981bec2/w/43ee445aa922ea6762a5f7dd/e/6efc0dda13af70cadb35c135||U|1|o
+|DeSoto Technix LMEC - open source|~e87b71b9e9ce047626c24841/w/410d9534035ed5bbab2a4eaf/e/ccb91508099dc52ed0313338||U|1|o
+|Vector Wheel 2025|~42ca68d7bb31802b3d942bf9/w/8cd35408fd67e88aca8d62dc/e/1a759fb8052c001a523b8db0||U|c|o
+|Configurable Vector Wheel|~f69482ed9ec3e557dadb47fa/w/c0687b08ab029c1d489b2d5d/e/498825aa39b9bad0dfe5d629||U|c|o
+|Config Vector Wheel|~bd30d88845c48d6bf43dc537/w/6ab58f727a63b43fd6430d53/e/4ca45287a9fa31d5c3550bfc||U|c|o
+|OP Vector Wheel|~c40933219cd06ad8c4c8fea3/w/5f39c8cfae1c2b939dbdfa7a/e/0626e7ac292715b1073a7e89||U|c|o
+|DeSoto Technix Intake Wheel Molds - open source|~d23c90b957ebd495e4082a9c/w/f19e2e815d79e792e091747f/e/a6bbab5439221e002d19a135||U|4|o
+|0000 Robot|~a347ccbaf68f245233aadb8b/w/1078dadff6a13b8f52a83991/e/24ed58654cf353cf1731c47c||U|0|o
+|DeSoto Technix Driver Station V2 open source|~1693c6938b1468faf03ecfc0/w/6b049455594be60c17332c7f/e/1c5fa41470dd01b65068f1c3||U|e|o
+|DeSoto Technix mini field Decode - open source|~e1b00b6f7bc09819fbc3399d/w/886cd60135ed37883c664b70/e/7de2c0518b11954d7eb837c4||D|e|o
+|DeSoto Technix CAD Library - open source|~9d9a1c0f2b84d45aa07951db/w/d4035dd358375ab47f7a7167/e/9f36edf3e1ba48497165ab8f||U|e|o
+|Runtime Terror DECODE CAD Release|~fbf5f644193fb48f84061189/w/049b9a07ad6abe18f0ec57cb/e/f14f1bbfd54340dc9a5fc215||D|04678|o
+|FTC 9686 Configurable PTO Drivetrain|~27cd0088e0d2da67aba30ddd/w/3171c30bf4e97a7467e44258/e/aa804e3dad3c92ac9abaf8ed||U|b|o
+|Configurable Parts|~b273b67c06b86b78b01b6f3a/w/f8670c98f827edfb8e96e7e9/e/27acdf2ea2b9f18a5beaf8cf||U|e|o
+|Configurable Standoff W/ Screws|~c67c3ac3b1711af2bd16a1f9/w/b8d240960e922e9569d3d835/e/2a1741e8fd86798d34a4d26d||U|e|o
+|Configurable Parts|~b273b67c06b86b78b01b6f3a/w/f8670c98f827edfb8e96e7e9/e/385d4e8d7b40afeb52f2d868||U|e|o
+|Simplified Parts for FTC|~d9be4433b7029ab5b4f75f10/w/1a5d73ef77f67b265c6b7836/e/2590571e0cdeb7a0d86b4935||U|e|o
+|Config Bevel Gears|~47e426114f4851db3e3b7730/w/55fdfe2dbca4f7157db6ec6b/e/d9ae8183e9b230f1bc57a314||U|e|o
+|Opsign V2|~14a0c44fc41e80e35800f426/w/958bd03701db6ee037147cbe/e/30d9b98355bea811a598510e||U|d|o
+|PulleyGen with Mods (we didn't make the original)|~a116695750b054564ac11cbb/w/2025d9645023834db075348e/e/87987a3f29f6075a645ceb7b||U|e|o
+|Belt Gen V2|~c163c756b5096bcd95e5692a/w/44c5f14084d55dd0388345f0/e/cf391d827826f30c60340bcc||U|e|o
+|OpenFlap|~be87638aff058446ad26015b/w/85bf71fea2494fee9c7c652a/e/8fb72a0cf0f35eaff787b7a1||U|e|o
+|opTake|~0267c13a508c61819e4973b4/w/670e913cf8aec1a5d4745c33/e/1dd12bd2829f9d7d9aa8783a||U|4|o
+|OpWheel|~7ad7ca50c381036492cab695/w/f446daf1a21bb344d96eb600/e/e12212ceda747ac117b3560f||U|e|o
+|3D Printable Belt Gen|~1ee229f38a9c097e38383d06/w/9b002ade873f395d9c5d24ce/e/5bea9a0b868f45a81fab9cc2||U|e|o
+|OpSpool v2 (FTC 23511)|~761024cb69916ef24796adf4/w/3b4e2ddf805c257161fc8178/e/b2c99289828f511762ed90ea||U|6|o
+|opInsert|~4f3446e64b18f76af4773a36/w/84d84ca5d4800093934b8589/e/7adfb8c1449541a132fe5a9c||U|e|o
+|OpenSource belted slides|~cb717ee0e96f7e4d758745e8/w/2a0438f9e13d5703b4a32e6b/e/5062f8718c24276ecf762735||U|6|o
+|opInsert|~4f3446e64b18f76af4773a36/w/84d84ca5d4800093934b8589/e/afcb59626f0f14a756e1ca55||U|e|o
+|30030 Configurable Slides|~f733a4dbb62b9d5ad77ce67c/w/8547dd1f117f71f08076b593/e/b3eccd2e0ea51f72a618e9a8||U|6|o
+|Configurable Pivoting Boxtube|~1d5fbd5afcafea1a0631e79a/w/6a147045512cd9edc1824dba/e/8ca3b4a02fadc33e279dc3aa||U|e|o
+|Ball Bearings|~c1f95feab8b05f8a109a1d0d/w/26d8a345656ac5ccdc822964/e/a128dc1e317734f2200a3b12||U|e|o
+|Low Profile Encoder cap|~ae31de1ed462d38a4cb7ca33/w/709baa56ce0af4417e87cb72/e/276d0c32bffaf4048d07f72e||U|e|o
+|Better Motor Encoder Cap|~63662cbb31e620f39cc26b15/w/45837421b4d46ca352dfacea/e/0289e3f4782fc303f98659da||U|e|o
+|reinforced 1:1 adaptor|~366866ddd03a3f96ca45905a/w/21074797e98a494888b3461a/e/1aeca9afcdcbfff6af4ffd59||U|e|o
+|OP Clip|~7057074ee12fe53760491fa9/w/1a65bb36318bc0b1a631f722/e/e9e840007a31b08488facd6d||U|e|o
+|Partial Spur Gear|~a080503c6ba88885fa7109e2/w/06dc141527b5b4f2200fd3ac/e/3378425357649eecca08b4fc||U|e|o
+|Simba's OPMOLD|~ef083c656680dfe0b3a8be26/w/7e3b7c14bef644509842fb56/e/d186cbef7f80e52db2138a95||U|4|o
+|GearLabFS-Public|~f349bdd78c53f3325055aefc/w/161d6a507877f1872b55c2b4/e/cf458d3513d9d23ad23985b1||U|e|o
+|FTCdesign Featurescripts|~97721efb7fbf764743af6da4/w/1743c0d5cc701d0660d25046/e/ed18a1f17b42bfec9ecec277||U|e|o
+|14468 [undefined] FTC parts library|~fabdefdab2c9cd3eeec811e7/w/3083d1c568ab10fe97702b45/e/94dca7aaa563c0408e79a3fa||U|e|o
+R|CADProps STEP Viewer|https://www.cadprops.com/tools/step-viewer/||U||x
+R|openflap/openmold|https://linktr.ee/openflap_openmold||U||x
+R|BeeBase Email Form|https://docs.google.com/forms/d/e/1FAIpQLScGvSKK2jkKLHMN14fcMsvIJqI4KxvlUDKlqeZDL1gdmAwriA/viewform||U||d
+R|Application for Simba's Configurable Library|https://docs.google.com/forms/d/e/1FAIpQLSfvtfp1Wx4EGuyuSyEloqT9QSgdV30AA3W1iE03NG8OWfAHQA/viewform||U||d
+R|Mech Nest|https://mech-nest.com/||U||x
+R|Game Manual 0|https://gm0.org/en/latest/||U||x
+R|OpenVault - CAD - Active Intakes|https://www.open-vault-ftc.org/cad/active-intakes||U||x
+R|RoboFTC|https://roboftc.github.io/||U||x
+R|FRC CAD Collection - Spectrum3847 - Google Sheets|https://docs.google.com/spreadsheets/d/1acT6PpdR5l3zVhPqrehgamPsnUbk6yg-2JC5FcwIbb4/edit?gid=0#gid=0|FRC|U||d
+R|FTC Robot CAD Links - Google Sheets|https://docs.google.com/spreadsheets/d/1MstjdQAAN6Mti5REt0sNttYp219STDO5u0D5Ai3Y1m4/edit?pli=1&gid=0#gid=0||U||d
+R|App Store - Onshape|https://cad.onshape.com/appstore/apps/Design%20&%20Documentation/6515cfb91574253b1b96a6ba||U||o
+R|The Loony Squad - LoonyLib|https://www.theloonysquad.com/loonylib||U||x
+R|Open Source 3D Printable Items – Ferra Components|https://ferracomponents.com/collections/open-source-3d-printable-items||U||x
+</script>
+<script>
+{
+const SEASONS=[["B","Biobuzz 2026-2027"],["D","Decode 2025-2026"],["I","Into the Deep 2024-2025"],["C","Centerstage 2023-2024"],["P","Power Play 2022-2023"],["F","Freight Frenzy 2021-2022"],["S","Skystone 2019-2020"],["U","Unspecified / Offseason"]];
+const CATS=["Full Robot","Mecanum","Tank","Swerve Drive","Intake","Claw / Gripper","Linear Slides / Extension","Turret","Shooter","Undershooter","Counter Roller Shooter","Differential / PTO","Vector Wheel","Number Plate / Misc","Misc","Other"];
+const PLATS={o:["Onshape","#2d7ff9"],f:["Fusion 360","#f07b1d"],g:["GrabCAD","#1aa36f"],d:["Google Drive","#f2b600"],x:["Other","#8a8d93"]};
+const SN=Object.fromEntries(SEASONS),SRANK=Object.fromEntries(SEASONS.map((s,i)=>[s[0],i]));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+const ALL=document.getElementById('lib').textContent.split('\n').filter(l=>l.trim()&&!l.startsWith('#')).map((l,i)=>{
+ const [k,t,u,p,s,tg,pl]=l.split('|');
+ const tags=[...(tg||'')].map(c=>CATS[parseInt(c,36)]).filter(Boolean);
+ const url=u.startsWith('~')?'https://cad.onshape.com/documents/'+u.slice(1):u;
+ return {i,res:k==='R',title:t.replace(/¦/g,'|').trim()||'Untitled',url,prog:p||'FTC',season:s,tags,plat:pl,key:url,host:(()=>{try{return new URL(url).hostname.replace(/^www\./,'')}catch(e){return ''}})()};
+});
+
+let st={tab:'cad',q:'',prog:new Set(),season:new Set(),cat:new Set(),plat:new Set(),fav:false,sort:'new'};
+let favs=new Set(store.get('ocl-favs',[]));
+
+/* line drawings per mechanism */
+const D={
+ robot:'<rect x="14" y="30" width="72" height="34" rx="3"/><circle cx="26" cy="70" r="8"/><circle cx="74" cy="70" r="8"/><path d="M30 30V14h24l10 16"/><path d="M54 14l18-6"/>',
+ mec:'<rect x="20" y="16" width="60" height="58" rx="4"/><g><rect x="8" y="12" width="14" height="24" rx="3"/><rect x="78" y="12" width="14" height="24" rx="3"/><rect x="8" y="54" width="14" height="24" rx="3"/><rect x="78" y="54" width="14" height="24" rx="3"/></g><path d="M10 16l10 16M80 16l10 16M10 74l10-16M80 74l10-16"/>',
+ swerve:'<circle cx="50" cy="45" r="30"/><circle cx="50" cy="45" r="20" stroke-dasharray="4 4"/><rect x="42" y="24" width="16" height="42" rx="4"/><path d="M50 8v8M50 74v8M14 45H6M94 45h-8"/>',
+ intake:'<circle cx="28" cy="45" r="12"/><circle cx="72" cy="45" r="12"/><path d="M28 33h44M28 57h44"/><path d="M8 45h8M84 45h8" stroke-dasharray="3 3"/><circle cx="50" cy="45" r="5"/>',
+ claw:'<path d="M50 10v24"/><rect x="38" y="30" width="24" height="12" rx="2"/><path d="M40 42 26 60l8 16M60 42l14 18-8 16"/>',
+ slide:'<rect x="14" y="62" width="72" height="12" rx="2"/><rect x="22" y="46" width="64" height="12" rx="2"/><rect x="30" y="30" width="56" height="12" rx="2"/><path d="M86 36h6"/>',
+ turret:'<ellipse cx="50" cy="64" rx="34" ry="10"/><path d="M16 64V54c0-6 15-10 34-10s34 4 34 10v10"/><rect x="40" y="18" width="20" height="28" rx="3"/><path d="M60 26h26"/>',
+ shooter:'<circle cx="38" cy="50" r="18"/><circle cx="38" cy="50" r="4"/><path d="M58 40c12-10 20-18 28-26M64 14h22v22"/><circle cx="70" cy="30" r="5"/>',
+ diff:'<circle cx="34" cy="45" r="18"/><circle cx="66" cy="45" r="18"/><path d="M34 27v36M66 27v36M52 45h-4"/>',
+ vector:'<circle cx="50" cy="45" r="30"/><circle cx="50" cy="45" r="6"/><path d="M50 15v24M50 51v24M20 45h24M56 45h24"/><path d="M29 24l12 12M71 66 59 54"/>',
+ plate:'<rect x="10" y="26" width="80" height="38" rx="3"/><path d="M24 38h10v14M44 38h12v7H44v7h12M66 38v14M66 38h10"/>',
+ misc:'<path d="M30 20h40l12 25-12 25H30L18 45z"/><circle cx="50" cy="45" r="9"/>',
+ link:'<path d="M42 54 58 38"/><path d="M48 32l6-6a11 11 0 0 1 16 16l-6 6M52 58l-6 6a11 11 0 0 1-16-16l6-6"/>'
+};
+const draw=o=>{if(o.res)return D.link;const c=o.tags[0]||'';
+ if(c==='Full Robot')return D.robot;if(c==='Mecanum'||c==='Tank')return D.mec;if(c==='Swerve Drive')return D.swerve;if(c==='Intake')return D.intake;
+ if(c==='Claw / Gripper')return D.claw;if(c.startsWith('Linear'))return D.slide;if(c==='Turret')return D.turret;if(/Shooter/.test(c))return D.shooter;
+ if(c.startsWith('Differential'))return D.diff;if(c==='Vector Wheel')return D.vector;if(c.startsWith('Number'))return D.plate;return D.misc};
+
+const pool=()=>ALL.filter(o=>o.res===(st.tab==='res'));
+function match(o,skip){
+ if(st.fav&&!favs.has(o.key))return false;
+ if(st.q){const h=(o.title+' '+o.tags.join(' ')+' '+o.host+' '+(SN[o.season]||'')).toLowerCase();if(!st.q.split(/\s+/).every(w=>h.includes(w)))return false}
+ if(skip!=='prog'&&st.prog.size&&!st.prog.has(o.prog))return false;
+ if(skip!=='season'&&st.season.size&&!st.season.has(o.season))return false;
+ if(skip!=='cat'&&st.cat.size&&!o.tags.some(t=>st.cat.has(t)))return false;
+ if(skip!=='plat'&&st.plat.size&&!st.plat.has(o.plat))return false;
+ return true}
+
+function facet(id,key,opts){
+ const base=pool().filter(o=>match(o,key));
+ const el=document.getElementById(id);const leg=el.querySelector('legend').outerHTML;
+ el.innerHTML=leg+opts.map(([v,label,fn])=>{const n=base.filter(fn).length;
+  return `<label class="opt"><input type="checkbox" data-k="${key}" value="${esc(v)}" ${st[key].has(v)?'checked':''}><span>${esc(label)}</span><em>${n}</em></label>`}).join('')}
+
+function renderFacets(){
+ facet('f-prog','prog',[['FTC','FTC',o=>o.prog==='FTC'],['FRC','FRC',o=>o.prog==='FRC']]);
+ facet('f-season','season',SEASONS.map(([c,n])=>[c,n,o=>o.season===c]));
+ const catEl=document.getElementById('f-cat');catEl.hidden=st.tab==='res';
+ if(st.tab!=='res')facet('f-cat','cat',CATS.filter(c=>ALL.some(o=>o.tags.includes(c))).map(c=>[c,c,o=>o.tags.includes(c)]));
+ facet('f-plat','plat',Object.entries(PLATS).filter(([k])=>pool().some(o=>o.plat===k)).map(([k,[n]])=>[k,n,o=>o.plat===k]));
+}
+
+function card(o){
+ const [pn,pc]=PLATS[o.plat]||PLATS.x;const fav=favs.has(o.key);
+ const extra=o.tags.slice(1,4),rest=o.tags.length-4;
+ const pno=(o.res?'R-':'P-')+String(o.i+1).padStart(3,'0');
+ return `<article class="card${o.res?' res':''}">
+ <div class="pic">${o.res?'':`<svg viewBox="0 0 100 90" fill="none" stroke="var(--draw)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">${draw(o)}</svg><span class="pno">${pno}</span>`}
+ <button class="fav" type="button" data-fav="${esc(o.key)}" aria-pressed="${fav}" aria-label="${fav?'Remove from':'Add to'} favorites"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 17s-6.5-3.9-6.5-8.6A3.6 3.6 0 0 1 10 6a3.6 3.6 0 0 1 6.5 2.4C16.5 13.1 10 17 10 17Z"/></svg></button></div>
+ <div class="body"><h3>${esc(o.title)}</h3>
+ ${o.res?`<div class="dom">${esc(o.host)}</div>`:`<div class="tags"><span class="tg p">${o.prog}</span><span class="tg s">${esc(SN[o.season]||'')}</span>${o.tags[0]?`<span class="tg">${esc(o.tags[0])}</span>`:''}</div>
+ ${extra.length?`<div class="more">${extra.map(esc).join(' · ')}${rest>0?` · +${rest} more`:''}</div>`:''}`}
+ <div class="foot"><span class="plat"><i style="background:${pc}"></i>${pn}</span><a class="go" href="${esc(o.url)}" target="_blank" rel="noopener noreferrer">${o.res?'Open':'View CAD'}</a></div></div></article>`}
+
+function render(){
+ const list=pool().filter(o=>match(o));
+ const s=st.sort;
+ if(s==='new')list.sort((a,b)=>SRANK[a.season]-SRANK[b.season]||a.i-b.i);
+ if(s==='old')list.sort((a,b)=>SRANK[b.season]-SRANK[a.season]||a.i-b.i);
+ if(s==='az')list.sort((a,b)=>a.title.localeCompare(b.title));
+ if(s==='za')list.sort((a,b)=>b.title.localeCompare(a.title));
+ const total=pool().length,label=st.tab==='res'?'resources':'CAD files';
+ document.getElementById('count').innerHTML=`<b>${list.length}</b> of ${total} ${label}`;
+ document.getElementById('grid').innerHTML=list.length?list.map(card).join(''):`<div class="empty">Nothing matches these filters. <button class="btn" type="button" data-reset>Clear filters</button></div>`;
+ renderFacets();
+}
+
+const nCad=ALL.filter(o=>!o.res).length,nRes=ALL.length-nCad;
+document.getElementById('n-cad').textContent='('+nCad+')';document.getElementById('n-res').textContent='('+nRes+')';
+
+function setTab(t){if(st.tab!==t){['prog','season','cat','plat'].forEach(k=>st[k].clear())}st.tab=t;
+ document.getElementById('t-cad').setAttribute('aria-selected',t==='cad');document.getElementById('t-res').setAttribute('aria-selected',t==='res');
+ if(location.hash!=='#'+(t==='res'?'resources':'cad'))history.replaceState(null,'','#'+(t==='res'?'resources':'cad'));render()}
+document.getElementById('t-cad').onclick=()=>setTab('cad');
+document.getElementById('t-res').onclick=()=>setTab('res');
+window.addEventListener('hashchange',()=>setTab(location.hash==='#resources'?'res':'cad'));
+
+let qt;document.getElementById('q').addEventListener('input',e=>{clearTimeout(qt);qt=setTimeout(()=>{st.q=e.target.value.trim().toLowerCase();render()},120)});
+document.getElementById('favOnly').onchange=e=>{st.fav=e.target.checked;render()};
+document.getElementById('sort').onchange=e=>{st.sort=e.target.value;store.set('ocl-sort',st.sort);render()};
+document.getElementById('rail').addEventListener('change',e=>{const k=e.target.dataset.k;if(!k)return;e.target.checked?st[k].add(e.target.value):st[k].delete(e.target.value);render()});
+const reset=()=>{st.q='';st.fav=false;['prog','season','cat','plat'].forEach(k=>st[k].clear());document.getElementById('q').value='';document.getElementById('favOnly').checked=false;render()};
+document.getElementById('reset').onclick=reset;
+document.getElementById('grid').addEventListener('click',e=>{
+ if(e.target.closest('[data-reset]'))return reset();
+ const b=e.target.closest('[data-fav]');if(!b)return;const k=b.dataset.fav;
+ favs.has(k)?favs.delete(k):favs.add(k);store.set('ocl-favs',[...favs]);
+ const on=favs.has(k);b.setAttribute('aria-pressed',on);b.setAttribute('aria-label',(on?'Remove from':'Add to')+' favorites');if(st.fav)render()});
+
+const rail=document.getElementById('rail');
+document.getElementById('openFilt').onclick=e=>{e.stopPropagation();rail.classList.add('open')};
+document.addEventListener('click',e=>{if(rail.classList.contains('open')&&!rail.contains(e.target))rail.classList.remove('open')});
+
+const root=document.documentElement;let th=store.get('ocl-theme',null);if(th)root.dataset.theme=th;
+document.getElementById('theme').onclick=()=>{const dark=root.dataset.theme?root.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
+ root.dataset.theme=dark?'light':'dark';store.set('ocl-theme',root.dataset.theme)};
+
+/* submit dialog */
+const dlg=document.getElementById('dlg');
+document.getElementById('s-season').innerHTML=SEASONS.map(([c,n])=>`<option value="${c}">${n}</option>`).join('');
+document.getElementById('s-season').value='U';
+document.getElementById('s-plat').innerHTML=Object.entries(PLATS).map(([k,[n]])=>`<option value="${k}">${n}</option>`).join('');
+document.getElementById('s-cats').innerHTML=CATS.map((c,i)=>`<label><input type="checkbox" value="${i.toString(36)}">${esc(c)}</label>`).join('');
+let order=[];
+const line=()=>{const t=document.getElementById('s-title').value.trim().replace(/\|/g,'¦'),u=document.getElementById('s-url').value.trim();
+ if(!t||!/^https?:\/\//.test(u))return '';
+ const ush=u.startsWith('https://cad.onshape.com/documents/')?'~'+u.slice(34):u;const kind=document.getElementById('s-kind').value;
+ return [kind,t,ush,document.getElementById('s-prog').value,document.getElementById('s-season').value,kind?'':order.join(''),document.getElementById('s-plat').value].join('|')};
+const upd=()=>{const l=line();document.getElementById('s-out').textContent=l||'Fill in the title and a link starting with https:// to see the entry.'};
+document.getElementById('s-cats').addEventListener('change',e=>{const v=e.target.value;order=e.target.checked?[...order,v]:order.filter(x=>x!==v);upd()});
+dlg.addEventListener('input',upd);dlg.addEventListener('change',upd);
+document.getElementById('s-url').addEventListener('input',e=>{const h=e.target.value;const p=/onshape/.test(h)?'o':/autodesk360|fusion/.test(h)?'f':/grabcad/.test(h)?'g':/drive\.google|docs\.google/.test(h)?'d':null;if(p)document.getElementById('s-plat').value=p});
+document.getElementById('submit').onclick=()=>{try{dlg.showModal()}catch(e){dlg.setAttribute('open','')}};
+document.getElementById('s-close').onclick=()=>dlg.close();
+document.getElementById('s-copy').onclick=async e=>{const l=line();if(!l)return;try{await navigator.clipboard.writeText(l);e.target.textContent='Copied'}catch(err){e.target.textContent='Select the text above to copy'}setTimeout(()=>e.target.textContent='Copy entry',1800)};
+
+st.sort=store.get('ocl-sort','new');document.getElementById('sort').value=st.sort;
+if(location.hash==='#resources'){setTab('res')}else render();
+}
+</script>
+</body>
+</html>

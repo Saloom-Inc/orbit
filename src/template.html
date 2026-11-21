@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open CAD Library</title>
+<meta name="description" content="Open-source library of public FTC and FRC robot CAD: full robots, drivetrains, intakes, claws, slides, turrets and shooters on Onshape, Fusion 360, GrabCAD and Google Drive.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE: a working engineer's tool, calm and exact, built to be used mid-season.
+   IDEA: an engineering parts catalogue: drawing-sheet paper, part numbers, a title block.
+   PICTURE: the catalogue itself; each card carries a small line drawing of its mechanism.
+   COLOUR and TYPE: white sheet, graphite ink, one signal red; Archivo 800 titles, Archivo body.
+   LAYOUT: title block band, filter rail left, card grid right; rail folds into a drawer on phones. */
+:root{color-scheme:light dark;
+--bg:light-dark(#ffffff,#111214);--sheet:light-dark(#f4f4f1,#1a1b1e);--ink:light-dark(#16171a,#ecebe6);
+--mute:light-dark(#5d6066,#a2a4a9);--line:light-dark(#d9d9d4,#2e3034);--red:light-dark(#d6361b,#ff6a4d);
+--redink:#fff;--chip:light-dark(#ecece8,#25262a);--draw:light-dark(#2b2d31,#cfd0cc)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Archivo,system-ui,sans-serif;overflow-x:clip}
+a{color:inherit}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+.band{padding:clamp(20px,3vw,40px) max(4vw,16px)}
+.wrap{max-width:1320px;margin:0 auto}
+header.band{background:var(--sheet);border-bottom:1px solid var(--line);padding-bottom:0}
+.tb{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:18px;align-items:center}
+.logo{width:52px;height:52px}
+h1{font-size:clamp(28px,4vw,44px);line-height:1.05;margin:0;font-weight:800;letter-spacing:-.02em;text-wrap:balance}
+.sub{color:var(--mute);margin:6px 0 0;max-width:62ch}
+.acts{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.btn{min-height:44px;padding:0 16px;border-radius:6px;border:1px solid var(--line);background:var(--bg);cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:8px;text-decoration:none;white-space:nowrap}
+.btn.pri{background:var(--red);border-color:var(--red);color:var(--redink)}
+.btn.icon{width:44px;padding:0;justify-content:center}
+.tabs{display:flex;gap:4px;margin-top:22px}
+.tab{min-height:44px;padding:0 18px;border:1px solid var(--line);border-bottom:0;border-radius:8px 8px 0 0;background:transparent;cursor:pointer;font-weight:600;color:var(--mute)}
+.tab[aria-selected=true]{background:var(--bg);color:var(--ink);position:relative;top:1px}
+.tab b{font-weight:500;color:var(--mute);margin-left:4px}
+main.band{padding-top:24px}
+.lay{display:grid;grid-template-columns:260px minmax(0,1fr);gap:32px;align-items:start}
+aside{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto;padding-right:4px}
+fieldset{border:0;margin:0 0 20px;padding:0}
+legend{font-weight:700;font-size:14px;margin-bottom:8px}
+.search{width:100%;min-height:44px;font-size:16px;padding:0 12px;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+.opt{display:flex;align-items:center;gap:10px;min-height:34px;font-size:15px;cursor:pointer}
+.opt input{width:18px;height:18px;accent-color:var(--red);margin:0}
+.opt span{flex:1}.opt em{font-style:normal;color:var(--mute);font-size:13px;font-variant-numeric:tabular-nums}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.count{color:var(--mute)}.count b{color:var(--ink)}
+.sel{min-height:44px;padding:0 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);font-size:16px}
+.filt{display:none}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.card{border:1px solid var(--line);border-radius:10px;background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
+.pic{position:relative;aspect-ratio:16/10;background:var(--sheet);border-bottom:1px solid var(--line);
+background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:20px 20px;background-position:-1px -1px}
+.pic svg{position:absolute;inset:12% 18%;width:64%;height:76%}
+.pno{position:absolute;left:10px;bottom:8px;font-size:12px;color:var(--mute);background:var(--sheet);padding:0 4px;font-variant-numeric:tabular-nums}
+.fav{position:absolute;right:8px;top:8px;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--bg);cursor:pointer;display:grid;place-items:center}
+.fav svg{position:static;width:18px;height:18px}
+.fav[aria-pressed=true] path{fill:var(--red);stroke:var(--red)}
+.body{padding:14px 14px 12px;display:flex;flex-direction:column;gap:10px;flex:1}
+.card h3{margin:0;font-size:16px;line-height:1.3;font-weight:700;overflow-wrap:anywhere}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tg{font-size:13px;padding:2px 8px;border-radius:4px;background:var(--chip);white-space:nowrap}
+.tg.s{background:transparent;border:1px solid var(--line)}
+.tg.p{background:var(--ink);color:var(--bg)}
+.more{color:var(--mute);font-size:13px}
+.foot{margin-top:auto;display:flex;justify-content:space-between;align-items:center;gap:8px;padding-top:4px}
+.plat{font-size:13px;color:var(--mute);display:flex;align-items:center;gap:6px}
+.plat i{width:8px;height:8px;border-radius:50%;display:inline-block}
+.go{min-height:40px;padding:0 14px;border-radius:6px;background:var(--red);color:var(--redink);font-weight:600;font-size:14px;text-decoration:none;display:inline-flex;align-items:center;white-space:nowrap}
+.res .pic{aspect-ratio:auto;height:64px;background-image:none}
+.res .dom{font-size:13px;color:var(--mute);overflow-wrap:anywhere}
+.empty{padding:48px 16px;text-align:center;color:var(--mute);border:1px dashed var(--line);border-radius:10px}
+footer.band{border-top:1px solid var(--line);color:var(--mute);font-size:14px;background:var(--sheet)}
+footer p{margin:4px 0;max-width:80ch}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);padding:24px;width:min(560px,94vw)}
+dialog::backdrop{background:rgb(0 0 0/.45)}
+dialog h2{margin:0 0 4px;font-size:22px}
+dialog label{display:block;font-size:14px;font-weight:600;margin:12px 0 4px}
+dialog input,dialog select{width:100%;min-height:44px;font-size:16px;padding:0 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cats{display:flex;flex-wrap:wrap;gap:6px}
+.cats label{margin:0;font-weight:500;font-size:13px;display:flex;gap:6px;align-items:center;padding:4px 8px;border:1px solid var(--line);border-radius:4px;cursor:pointer}
+.cats input{width:auto;min-height:0}
+pre{background:var(--sheet);border:1px solid var(--line);border-radius:6px;padding:10px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;margin:12px 0 0}
+.dact{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
+.note{font-size:13px;color:var(--mute);margin:8px 0 0}
+@media (max-width:860px){
+ .lay{grid-template-columns:minmax(0,1fr)}
+ aside{position:fixed;inset:0 auto 0 0;width:min(320px,88vw);max-height:none;background:var(--bg);z-index:20;padding:20px;border-right:1px solid var(--line);transform:translateX(-105%);transition:transform .2s}
+ aside.open{transform:none;box-shadow:0 0 0 100vmax rgb(0 0 0/.4)}
+ .filt{display:inline-flex}
+}
+@media (max-width:600px){.tb{grid-template-columns:auto minmax(0,1fr)}.acts{grid-column:1/-1;justify-content:flex-start}.grid{grid-template-columns:minmax(0,1fr)}.row{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){aside{transition:none}}
+</style>
+</head>
+<body>
+<header class="band">
+ <div class="wrap">
+  <div class="tb">
+   <svg class="logo" viewBox="0 0 52 52" aria-hidden="true"><rect x="1" y="1" width="50" height="50" rx="8" fill="var(--red)"/><g fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"><path d="M26 10 40 18v16l-14 8-14-8V18z"/><path d="M12 18l14 8 14-8M26 26v16"/></g></svg>
+   <div>
+    <h1>Open CAD Library</h1>
+    <p class="sub">Public FTC &amp; FRC robot CAD shared by teams. Filter by season or mechanism, then open the files in Onshape, Fusion 360, GrabCAD or Google Drive.</p>
+   </div>
+   <div class="acts">
+    <button class="btn filt" id="openFilt" type="button">Filters</button>
+    <button class="btn icon" id="theme" type="button" aria-label="Toggle dark mode" title="Toggle dark mode"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M16.5 12.2A7 7 0 0 1 7.8 3.5a7 7 0 1 0 8.7 8.7Z"/></svg></button>
+    <button class="btn pri" id="submit" type="button">Submit to library</button>
+   </div>
+  </div>
+  <div class="tabs" role="tablist">
+   <button class="tab" role="tab" id="t-cad" aria-selected="true" type="button">CAD files<b id="n-cad"></b></button>
+   <button class="tab" role="tab" id="t-res" aria-selected="false" type="button">Resources<b id="n-res"></b></button>
+  </div>
+ </div>
+</header>
+
+<main class="band">
+ <div class="wrap lay">
+  <aside id="rail" aria-label="Filters">
+   <fieldset><label class="opt"><input type="checkbox" id="favOnly"><span>Favorites only</span></label></fieldset>
+   <fieldset><legend><label for="q">Search</label></legend><input class="search" id="q" type="search" placeholder="Robot, team number, mechanism…" autocomplete="off"></fieldset>
+   <fieldset id="f-prog"><legend>Program</legend></fieldset>
+   <fieldset id="f-season"><legend>Season</legend></fieldset>
+   <fieldset id="f-cat"><legend>Category</legend></fieldset>
+   <fieldset id="f-plat"><legend>CAD platform</legend></fieldset>
+   <button class="btn" id="reset" type="button">Clear all filters</button>
+  </aside>
+  <section aria-live="polite">
+   <div class="bar">
+    <div class="count" id="count"></div>
+    <label>Sort <select class="sel" id="sort">
+     <option value="new">Newest season first</option>
+     <option value="old">Oldest season first</option>
+     <option value="az">Title A–Z</option>
+     <option value="za">Title Z–A</option>
+     <option value="lib">Library order</option>
+    </select></label>
+   </div>
+   <div class="grid" id="grid"></div>
+  </section>
+ </div>
+</main>
+
+<footer class="band">
+ <div class="wrap">
+  <p>Open-source and community-maintained. Every design belongs to the team that published it; this site only links to their public files.</p>
+  <p>Link index first compiled at <a href="https://www.cadbaseftc.com/">cadbaseftc.com</a> by FTC team 31071 Stratos. To add or fix an entry, use “Submit to library” and send the generated line as a pull request to <code>data/library.txt</code>.</p>
+ </div>
+</footer>
+
+<dialog id="dlg">
+ <form id="sf" method="dialog">
+  <h2>Submit to library</h2>
+  <p class="note">Fill this in to generate an entry line, then add it to <code>data/library.txt</code> in a pull request.</p>
+  <label for="s-title">Title</label><input id="s-title" required placeholder="e.g. 12345 Decode Robot">
+  <label for="s-url">Public CAD link</label><input id="s-url" type="url" required placeholder="https://cad.onshape.com/documents/…">
+  <div class="row">
+   <div><label for="s-kind">Type</label><select id="s-kind"><option value="">CAD file</option><option value="R">Resource</option></select></div>
+   <div><label for="s-prog">Program</label><select id="s-prog"><option value="">FTC</option><option>FRC</option></select></div>
+  </div>
+  <div class="row">
+   <div><label for="s-season">Season</label><select id="s-season"></select></div>
+   <div><label for="s-plat">Platform</label><select id="s-plat"></select></div>
+  </div>
+  <label>Categories (first ticked = primary)</label><div class="cats" id="s-cats"></div>
+  <pre id="s-out">Fill in the title and link to see the entry.</pre>
+  <div class="dact"><button class="btn" type="button" id="s-close">Close</button><button class="btn pri" type="button" id="s-copy">Copy entry</button></div>
+ </form>
+</dialog>
+
+<script id="lib" type="text/plain">__DATA__</script>
+<script>
+{
+const SEASONS=[["B","Biobuzz 2026-2027"],["D","Decode 2025-2026"],["I","Into the Deep 2024-2025"],["C","Centerstage 2023-2024"],["P","Power Play 2022-2023"],["F","Freight Frenzy 2021-2022"],["S","Skystone 2019-2020"],["U","Unspecified / Offseason"]];
+const CATS=["Full Robot","Mecanum","Tank","Swerve Drive","Intake","Claw / Gripper","Linear Slides / Extension","Turret","Shooter","Undershooter","Counter Roller Shooter","Differential / PTO","Vector Wheel","Number Plate / Misc","Misc","Other"];
+const PLATS={o:["Onshape","#2d7ff9"],f:["Fusion 360","#f07b1d"],g:["GrabCAD","#1aa36f"],d:["Google Drive","#f2b600"],x:["Other","#8a8d93"]};
+const SN=Object.fromEntries(SEASONS),SRANK=Object.fromEntries(SEASONS.map((s,i)=>[s[0],i]));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+const ALL=document.getElementById('lib').textContent.split('\n').filter(l=>l.trim()&&!l.startsWith('#')).map((l,i)=>{
+ const [k,t,u,p,s,tg,pl]=l.split('|');
+ const tags=[...(tg||'')].map(c=>CATS[parseInt(c,36)]).filter(Boolean);
+ const url=u.startsWith('~')?'https://cad.onshape.com/documents/'+u.slice(1):u;
+ return {i,res:k==='R',title:t.replace(/¦/g,'|').trim()||'Untitled',url,prog:p||'FTC',season:s,tags,plat:pl,key:url,host:(()=>{try{return new URL(url).hostname.replace(/^www\./,'')}catch(e){return ''}})()};
+});
+
+let st={tab:'cad',q:'',prog:new Set(),season:new Set(),cat:new Set(),plat:new Set(),fav:false,sort:'new'};
+let favs=new Set(store.get('ocl-favs',[]));
+
+/* line drawings per mechanism */
+const D={
+ robot:'<rect x="14" y="30" width="72" height="34" rx="3"/><circle cx="26" cy="70" r="8"/><circle cx="74" cy="70" r="8"/><path d="M30 30V14h24l10 16"/><path d="M54 14l18-6"/>',
+ mec:'<rect x="20" y="16" width="60" height="58" rx="4"/><g><rect x="8" y="12" width="14" height="24" rx="3"/><rect x="78" y="12" width="14" height="24" rx="3"/><rect x="8" y="54" width="14" height="24" rx="3"/><rect x="78" y="54" width="14" height="24" rx="3"/></g><path d="M10 16l10 16M80 16l10 16M10 74l10-16M80 74l10-16"/>',
+ swerve:'<circle cx="50" cy="45" r="30"/><circle cx="50" cy="45" r="20" stroke-dasharray="4 4"/><rect x="42" y="24" width="16" height="42" rx="4"/><path d="M50 8v8M50 74v8M14 45H6M94 45h-8"/>',
+ intake:'<circle cx="28" cy="45" r="12"/><circle cx="72" cy="45" r="12"/><path d="M28 33h44M28 57h44"/><path d="M8 45h8M84 45h8" stroke-dasharray="3 3"/><circle cx="50" cy="45" r="5"/>',
+ claw:'<path d="M50 10v24"/><rect x="38" y="30" width="24" height="12" rx="2"/><path d="M40 42 26 60l8 16M60 42l14 18-8 16"/>',
+ slide:'<rect x="14" y="62" width="72" height="12" rx="2"/><rect x="22" y="46" width="64" height="12" rx="2"/><rect x="30" y="30" width="56" height="12" rx="2"/><path d="M86 36h6"/>',
+ turret:'<ellipse cx="50" cy="64" rx="34" ry="10"/><path d="M16 64V54c0-6 15-10 34-10s34 4 34 10v10"/><rect x="40" y="18" width="20" height="28" rx="3"/><path d="M60 26h26"/>',
+ shooter:'<circle cx="38" cy="50" r="18"/><circle cx="38" cy="50" r="4"/><path d="M58 40c12-10 20-18 28-26M64 14h22v22"/><circle cx="70" cy="30" r="5"/>',
+ diff:'<circle cx="34" cy="45" r="18"/><circle cx="66" cy="45" r="18"/><path d="M34 27v36M66 27v36M52 45h-4"/>',
+ vector:'<circle cx="50" cy="45" r="30"/><circle cx="50" cy="45" r="6"/><path d="M50 15v24M50 51v24M20 45h24M56 45h24"/><path d="M29 24l12 12M71 66 59 54"/>',
+ plate:'<rect x="10" y="26" width="80" height="38" rx="3"/><path d="M24 38h10v14M44 38h12v7H44v7h12M66 38v14M66 38h10"/>',
+ misc:'<path d="M30 20h40l12 25-12 25H30L18 45z"/><circle cx="50" cy="45" r="9"/>',
+ link:'<path d="M42 54 58 38"/><path d="M48 32l6-6a11 11 0 0 1 16 16l-6 6M52 58l-6 6a11 11 0 0 1-16-16l6-6"/>'
+};
+const draw=o=>{if(o.res)return D.link;const c=o.tags[0]||'';
+ if(c==='Full Robot')return D.robot;if(c==='Mecanum'||c==='Tank')return D.mec;if(c==='Swerve Drive')return D.swerve;if(c==='Intake')return D.intake;
+ if(c==='Claw / Gripper')return D.claw;if(c.startsWith('Linear'))return D.slide;if(c==='Turret')return D.turret;if(/Shooter/.test(c))return D.shooter;
+ if(c.startsWith('Differential'))return D.diff;if(c==='Vector Wheel')return D.vector;if(c.startsWith('Number'))return D.plate;return D.misc};
+
+const pool=()=>ALL.filter(o=>o.res===(st.tab==='res'));
+function match(o,skip){
+ if(st.fav&&!favs.has(o.key))return false;
+ if(st.q){const h=(o.title+' '+o.tags.join(' ')+' '+o.host+' '+(SN[o.season]||'')).toLowerCase();if(!st.q.split(/\s+/).every(w=>h.includes(w)))return false}
+ if(skip!=='prog'&&st.prog.size&&!st.prog.has(o.prog))return false;
+ if(skip!=='season'&&st.season.size&&!st.season.has(o.season))return false;
+ if(skip!=='cat'&&st.cat.size&&!o.tags.some(t=>st.cat.has(t)))return false;
+ if(skip!=='plat'&&st.plat.size&&!st.plat.has(o.plat))return false;
+ return true}
+
+function facet(id,key,opts){
+ const base=pool().filter(o=>match(o,key));
+ const el=document.getElementById(id);const leg=el.querySelector('legend').outerHTML;
+ el.innerHTML=leg+opts.map(([v,label,fn])=>{const n=base.filter(fn).length;
+  return `<label class="opt"><input type="checkbox" data-k="${key}" value="${esc(v)}" ${st[key].has(v)?'checked':''}><span>${esc(label)}</span><em>${n}</em></label>`}).join('')}
+
+function renderFacets(){
+ facet('f-prog','prog',[['FTC','FTC',o=>o.prog==='FTC'],['FRC','FRC',o=>o.prog==='FRC']]);
+ facet('f-season','season',SEASONS.map(([c,n])=>[c,n,o=>o.season===c]));
+ const catEl=document.getElementById('f-cat');catEl.hidden=st.tab==='res';
+ if(st.tab!=='res')facet('f-cat','cat',CATS.filter(c=>ALL.some(o=>o.tags.includes(c))).map(c=>[c,c,o=>o.tags.includes(c)]));
+ facet('f-plat','plat',Object.entries(PLATS).filter(([k])=>pool().some(o=>o.plat===k)).map(([k,[n]])=>[k,n,o=>o.plat===k]));
+}
+
+function card(o){
+ const [pn,pc]=PLATS[o.plat]||PLATS.x;const fav=favs.has(o.key);
+ const extra=o.tags.slice(1,4),rest=o.tags.length-4;
+ const pno=(o.res?'R-':'P-')+String(o.i+1).padStart(3,'0');
+ return `<article class="card${o.res?' res':''}">
+ <div class="pic">${o.res?'':`<svg viewBox="0 0 100 90" fill="none" stroke="var(--draw)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">${draw(o)}</svg><span class="pno">${pno}</span>`}
+ <button class="fav" type="button" data-fav="${esc(o.key)}" aria-pressed="${fav}" aria-label="${fav?'Remove from':'Add to'} favorites"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 17s-6.5-3.9-6.5-8.6A3.6 3.6 0 0 1 10 6a3.6 3.6 0 0 1 6.5 2.4C16.5 13.1 10 17 10 17Z"/></svg></button></div>
+ <div class="body"><h3>${esc(o.title)}</h3>
+ ${o.res?`<div class="dom">${esc(o.host)}</div>`:`<div class="tags"><span class="tg p">${o.prog}</span><span class="tg s">${esc(SN[o.season]||'')}</span>${o.tags[0]?`<span class="tg">${esc(o.tags[0])}</span>`:''}</div>
+ ${extra.length?`<div class="more">${extra.map(esc).join(' · ')}${rest>0?` · +${rest} more`:''}</div>`:''}`}
+ <div class="foot"><span class="plat"><i style="background:${pc}"></i>${pn}</span><a class="go" href="${esc(o.url)}" target="_blank" rel="noopener noreferrer">${o.res?'Open':'View CAD'}</a></div></div></article>`}
+
+function render(){
+ const list=pool().filter(o=>match(o));
+ const s=st.sort;
+ if(s==='new')list.sort((a,b)=>SRANK[a.season]-SRANK[b.season]||a.i-b.i);
+ if(s==='old')list.sort((a,b)=>SRANK[b.season]-SRANK[a.season]||a.i-b.i);
+ if(s==='az')list.sort((a,b)=>a.title.localeCompare(b.title));
+ if(s==='za')list.sort((a,b)=>b.title.localeCompare(a.title));
+ const total=pool().length,label=st.tab==='res'?'resources':'CAD files';
+ document.getElementById('count').innerHTML=`<b>${list.length}</b> of ${total} ${label}`;
+ document.getElementById('grid').innerHTML=list.length?list.map(card).join(''):`<div class="empty">Nothing matches these filters. <button class="btn" type="button" data-reset>Clear filters</button></div>`;
+ renderFacets();
+}
+
+const nCad=ALL.filter(o=>!o.res).length,nRes=ALL.length-nCad;
+document.getElementById('n-cad').textContent='('+nCad+')';document.getElementById('n-res').textContent='('+nRes+')';
+
+function setTab(t){if(st.tab!==t){['prog','season','cat','plat'].forEach(k=>st[k].clear())}st.tab=t;
+ document.getElementById('t-cad').setAttribute('aria-selected',t==='cad');document.getElementById('t-res').setAttribute('aria-selected',t==='res');
+ if(location.hash!=='#'+(t==='res'?'resources':'cad'))history.replaceState(null,'','#'+(t==='res'?'resources':'cad'));render()}
+document.getElementById('t-cad').onclick=()=>setTab('cad');
+document.getElementById('t-res').onclick=()=>setTab('res');
+window.addEventListener('hashchange',()=>setTab(location.hash==='#resources'?'res':'cad'));
+
+let qt;document.getElementById('q').addEventListener('input',e=>{clearTimeout(qt);qt=setTimeout(()=>{st.q=e.target.value.trim().toLowerCase();render()},120)});
+document.getElementById('favOnly').onchange=e=>{st.fav=e.target.checked;render()};
+document.getElementById('sort').onchange=e=>{st.sort=e.target.value;store.set('ocl-sort',st.sort);render()};
+document.getElementById('rail').addEventListener('change',e=>{const k=e.target.dataset.k;if(!k)return;e.target.checked?st[k].add(e.target.value):st[k].delete(e.target.value);render()});
+const reset=()=>{st.q='';st.fav=false;['prog','season','cat','plat'].forEach(k=>st[k].clear());document.getElementById('q').value='';document.getElementById('favOnly').checked=false;render()};
+document.getElementById('reset').onclick=reset;
+document.getElementById('grid').addEventListener('click',e=>{
+ if(e.target.closest('[data-reset]'))return reset();
+ const b=e.target.closest('[data-fav]');if(!b)return;const k=b.dataset.fav;
+ favs.has(k)?favs.delete(k):favs.add(k);store.set('ocl-favs',[...favs]);
+ const on=favs.has(k);b.setAttribute('aria-pressed',on);b.setAttribute('aria-label',(on?'Remove from':'Add to')+' favorites');if(st.fav)render()});
+
+const rail=document.getElementById('rail');
+document.getElementById('openFilt').onclick=e=>{e.stopPropagation();rail.classList.add('open')};
+document.addEventListener('click',e=>{if(rail.classList.contains('open')&&!rail.contains(e.target))rail.classList.remove('open')});
+
+const root=document.documentElement;let th=store.get('ocl-theme',null);if(th)root.dataset.theme=th;
+document.getElementById('theme').onclick=()=>{const dark=root.dataset.theme?root.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
+ root.dataset.theme=dark?'light':'dark';store.set('ocl-theme',root.dataset.theme)};
+
+/* submit dialog */
+const dlg=document.getElementById('dlg');
+document.getElementById('s-season').innerHTML=SEASONS.map(([c,n])=>`<option value="${c}">${n}</option>`).join('');
+document.getElementById('s-season').value='U';
+document.getElementById('s-plat').innerHTML=Object.entries(PLATS).map(([k,[n]])=>`<option value="${k}">${n}</option>`).join('');
+document.getElementById('s-cats').innerHTML=CATS.map((c,i)=>`<label><input type="checkbox" value="${i.toString(36)}">${esc(c)}</label>`).join('');
+let order=[];
+const line=()=>{const t=document.getElementById('s-title').value.trim().replace(/\|/g,'¦'),u=document.getElementById('s-url').value.trim();
+ if(!t||!/^https?:\/\//.test(u))return '';
+ const ush=u.startsWith('https://cad.onshape.com/documents/')?'~'+u.slice(34):u;const kind=document.getElementById('s-kind').value;
+ return [kind,t,ush,document.getElementById('s-prog').value,document.getElementById('s-season').value,kind?'':order.join(''),document.getElementById('s-plat').value].join('|')};
+const upd=()=>{const l=line();document.getElementById('s-out').textContent=l||'Fill in the title and a link starting with https:// to see the entry.'};
+document.getElementById('s-cats').addEventListener('change',e=>{const v=e.target.value;order=e.target.checked?[...order,v]:order.filter(x=>x!==v);upd()});
+dlg.addEventListener('input',upd);dlg.addEventListener('change',upd);
+document.getElementById('s-url').addEventListener('input',e=>{const h=e.target.value;const p=/onshape/.test(h)?'o':/autodesk360|fusion/.test(h)?'f':/grabcad/.test(h)?'g':/drive\.google|docs\.google/.test(h)?'d':null;if(p)document.getElementById('s-plat').value=p});
+document.getElementById('submit').onclick=()=>{try{dlg.showModal()}catch(e){dlg.setAttribute('open','')}};
+document.getElementById('s-close').onclick=()=>dlg.close();
+document.getElementById('s-copy').onclick=async e=>{const l=line();if(!l)return;try{await navigator.clipboard.writeText(l);e.target.textContent='Copied'}catch(err){e.target.textContent='Select the text above to copy'}setTimeout(()=>e.target.textContent='Copy entry',1800)};
+
+st.sort=store.get('ocl-sort','new');document.getElementById('sort').value=st.sort;
+if(location.hash==='#resources'){setTab('res')}else render();
+}
+</script>
+</body>
+</html>
