@@ -1,4 +1,6 @@
-# Open CAD Library
+# Open CAD Library: an Orbit × Comet initiative
+
+Live site: https://saloom-inc.github.io/orbit/
 
 An open-source, single-page library of public **FTC & FRC robot CAD**: 254 CAD files and 13 resources. You can browse by program, season, mechanism and CAD platform (Onshape, Fusion 360, GrabCAD, Google Drive).
 
@@ -11,13 +13,17 @@ It has no backend, no build tooling and no tracking. It is one static `index.htm
 - Sorting: newest season, oldest season, A–Z, Z–A, library order
 - Favorites and dark mode, saved in your browser
 - A "Submit to library" form that generates a ready-to-paste data line
-- Each card gets a line drawing of its mechanism, so no third-party thumbnails are needed
+- Real CAD preview thumbnails stored in this repo (`thumbs/`). Entries without one show a line drawing of their mechanism.
+- NeoPOP-style UI (after CRED's design system) in Orbit yellow and the Comet gradient
 
 ## Project layout
 ```
 data/library.txt    ← the whole dataset, one entry per line (edit this)
 src/template.html   ← page, styles and script
-build.py            ← merges the two into index.html
+build.py            ← merges the two (plus thumbs/) into index.html
+scripts/fetch_thumbs.py ← downloads missing thumbnails as WebP
+thumbs/             ← <sha1(url)[:12]>.webp preview images
+.github/workflows/  ← GitHub Action: fetch thumbnails, rebuild, commit
 index.html          ← built site (deploy this)
 ```
 
@@ -37,6 +43,14 @@ index.html          ← built site (deploy this)
 1. Open the site and click **Submit to library**, then copy the generated line. You can also write the line by hand.
 2. Add it to `data/library.txt`.
 3. Run `python3 build.py` and open a pull request.
+
+## Thumbnails
+The **Thumbnails and build** Action runs whenever `data/library.txt`, `src/`, `scripts/` or `build.py` changes on `main`. You can also run it from the Actions tab. It:
+1. Downloads a preview for every CAD entry that has none yet. It uses the image cadbaseftc.com already shows for that link, and otherwise asks Onshape's thumbnail API.
+2. Shrinks each image to a 640px WebP in `thumbs/`.
+3. Rebuilds `index.html` and commits the result.
+
+For automatic Onshape previews of new submissions, add two repository secrets, `ONSHAPE_ACCESS_KEY` and `ONSHAPE_SECRET_KEY`. Create them at https://dev-portal.onshape.com/keys with read access. Fusion 360, GrabCAD and Google Drive entries need a thumbnail added by hand: put a `.webp` in `thumbs/` named after the entry's key.
 
 ## Credits
 The link index was first compiled at [cadbaseftc.com](https://www.cadbaseftc.com/) by FTC team 31071 Stratos. Every CAD design belongs to the team that published it. This project only links to their public files.

@@ -1,120 +1,188 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Open CAD Library</title>
-<meta name="description" content="Open-source library of public FTC and FRC robot CAD: full robots, drivetrains, intakes, claws, slides, turrets and shooters on Onshape, Fusion 360, GrabCAD and Google Drive.">
+<title>Orbit × Comet · Open CAD Library</title>
+<meta name="description" content="An Orbit × Comet initiative: an open-source library of public FTC and FRC robot CAD, with full robots, drivetrains, intakes, claws, slides, turrets and shooters.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
-/* VOICE: a working engineer's tool, calm and exact, built to be used mid-season.
-   IDEA: an engineering parts catalogue: drawing-sheet paper, part numbers, a title block.
-   PICTURE: the catalogue itself; each card carries a small line drawing of its mechanism.
-   COLOUR and TYPE: white sheet, graphite ink, one signal red; Archivo 800 titles, Archivo body.
-   LAYOUT: title block band, filter rail left, card grid right; rail folds into a drawer on phones. */
-:root{color-scheme:light dark;
---bg:light-dark(#ffffff,#111214);--sheet:light-dark(#f4f4f1,#1a1b1e);--ink:light-dark(#16171a,#ecebe6);
---mute:light-dark(#5d6066,#a2a4a9);--line:light-dark(#d9d9d4,#2e3034);--red:light-dark(#d6361b,#ff6a4d);
---redink:#fff;--chip:light-dark(#ecece8,#25262a);--draw:light-dark(#2b2d31,#cfd0cc)}
-:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+/* VOICE: NeoPOP, after CRED's kit: loud, young and exact, for teams who build robots.
+   IDEA: a launch pad. Orbit (yellow ring) and Comet (orange streak) present the catalogue.
+   PICTURE: both marks large in the hero with a live stats strip; each card has a yellow line drawing of its mechanism.
+   COLOUR and TYPE: pop black #0d0d0d, Orbit yellow #FFD60A, Comet orange gradient; Outfit (for Gilroy), Fraunces (for Cirka), Plex Mono labels.
+   LAYOUT: hero band, filter rail plus grid, raised 3D NeoPOP buttons with edge faces, sharp corners everywhere. */
+:root{--bg:#0d0d0d;--s1:#141414;--s2:#1c1c1c;--line:#2a2a2a;--ink:#ffffff;--mute:#8a8a8a;
+--y:#FFD60A;--yR:#C9A400;--yB:#8a7000;--o1:#FFE3A3;--o2:#F6A83B;--o3:#E8611A;--oR:#b8480f;--oB:#7a2e08;
+--grad:linear-gradient(135deg,var(--o1),var(--o2) 40%,var(--o3));--draw:#FFD60A;--grid:#1a1a1a;--cardEdge:#FFD60A;color-scheme:dark}
+:root[data-theme=light]{--bg:#ffffff;--s1:#f5f5f5;--s2:#ececec;--line:#0d0d0d;--ink:#0d0d0d;--mute:#5a5a5a;--draw:#0d0d0d;--grid:#e6e6e6;--cardEdge:#0d0d0d;color-scheme:light}
 *{box-sizing:border-box;min-width:0}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Archivo,system-ui,sans-serif;overflow-x:clip}
-a{color:inherit}
-button,input,select{font:inherit;color:inherit}
-:focus-visible{outline:2px solid var(--red);outline-offset:2px}
-.band{padding:clamp(20px,3vw,40px) max(4vw,16px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Outfit,system-ui,sans-serif;overflow-x:clip}
+a{color:inherit}button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--y);outline-offset:3px}
 .wrap{max-width:1320px;margin:0 auto}
-header.band{background:var(--sheet);border-bottom:1px solid var(--line);padding-bottom:0}
-.tb{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:18px;align-items:center}
-.logo{width:52px;height:52px}
-h1{font-size:clamp(28px,4vw,44px);line-height:1.05;margin:0;font-weight:800;letter-spacing:-.02em;text-wrap:balance}
-.sub{color:var(--mute);margin:6px 0 0;max-width:62ch}
-.acts{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-.btn{min-height:44px;padding:0 16px;border-radius:6px;border:1px solid var(--line);background:var(--bg);cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:8px;text-decoration:none;white-space:nowrap}
-.btn.pri{background:var(--red);border-color:var(--red);color:var(--redink)}
-.btn.icon{width:44px;padding:0;justify-content:center}
-.tabs{display:flex;gap:4px;margin-top:22px}
-.tab{min-height:44px;padding:0 18px;border:1px solid var(--line);border-bottom:0;border-radius:8px 8px 0 0;background:transparent;cursor:pointer;font-weight:600;color:var(--mute)}
-.tab[aria-selected=true]{background:var(--bg);color:var(--ink);position:relative;top:1px}
-.tab b{font-weight:500;color:var(--mute);margin-left:4px}
-main.band{padding-top:24px}
+.band{padding:clamp(24px,4vw,56px) max(4vw,16px)}
+.mono{font-family:"IBM Plex Mono",monospace;font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+
+/* NeoPOP raised button: two edge faces, pressed state sinks into them */
+.pop{--d:5px;--f:var(--y);--r:var(--yR);--b:var(--yB);position:relative;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;
+ background:var(--f);color:#0d0d0d;border:0;border-radius:0;font-weight:700;text-decoration:none;cursor:pointer;white-space:nowrap;margin:0 var(--d) var(--d) 0;transition:transform .08s ease-out}
+.pop::before,.pop::after{content:"";position:absolute;transition:opacity .08s}
+.pop::before{top:0;right:calc(-1*var(--d));width:var(--d);height:calc(100% + var(--d));background:var(--r);clip-path:polygon(0 0,100% var(--d),100% 100%,0 calc(100% - var(--d)))}
+.pop::after{left:0;bottom:calc(-1*var(--d));height:var(--d);width:calc(100% + var(--d));background:var(--b);clip-path:polygon(0 0,calc(100% - var(--d)) 0,100% 100%,var(--d) 100%)}
+.pop:active{transform:translate(var(--d),var(--d))}.pop:active::before,.pop:active::after{opacity:0}
+.pop.ghost{--f:var(--bg);--r:var(--ink);--b:var(--ink);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink)}
+.pop.comet{--f:var(--o2);--r:var(--oR);--b:var(--oB);background:var(--grad)}
+.pop.sq{width:44px;padding:0}
+
+header{border-bottom:1px solid var(--line);position:relative;overflow:hidden;
+ background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:48px 48px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.lock{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;letter-spacing:.02em}
+.lock svg{height:34px;width:auto}.lock .x{color:var(--mute);font-weight:500}
+.acts{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.hero{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:center;margin-top:clamp(28px,5vw,64px)}
+.kick{display:inline-flex;gap:8px;align-items:center;color:var(--y);margin-bottom:16px}
+.kick i{width:10px;height:10px;background:var(--grad);display:inline-block}
+h1{font-family:Fraunces,Georgia,serif;font-weight:700;font-size:clamp(40px,6.4vw,80px);line-height:1;letter-spacing:-.02em;margin:0;text-wrap:balance}
+h1 em{font-style:normal;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lede{color:var(--mute);font-size:18px;max-width:52ch;margin:18px 0 26px}
+.ctas{display:flex;gap:14px;flex-wrap:wrap}
+.art{position:relative;aspect-ratio:1;max-width:460px;width:100%;justify-self:end}
+.art .ring{position:absolute;inset:6%;border:1.5px dashed var(--line);border-radius:50%}
+.art .ring2{position:absolute;inset:22%;border:1.5px solid var(--line);border-radius:50%}
+.art svg{position:absolute}
+.art .om{width:46%;left:2%;top:4%;filter:drop-shadow(0 18px 40px rgb(255 214 10/.22))}
+.art .cm{width:44%;right:2%;bottom:4%;filter:drop-shadow(0 18px 40px rgb(232 97 26/.3))}
+.art .xx{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font:800 28px Outfit;color:var(--ink);background:var(--bg);border:1.5px solid var(--ink);width:56px;height:56px;display:grid;place-items:center}
+@media (prefers-reduced-motion:no-preference){.art .ring{animation:spin 40s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1.5px solid var(--ink);margin-top:clamp(28px,4vw,48px);background:var(--bg)}
+.stat{padding:16px 18px;border-right:1.5px solid var(--ink)}.stat:last-child{border-right:0}
+.stat b{display:block;font-size:clamp(28px,3.4vw,40px);line-height:1;font-weight:800;font-variant-numeric:tabular-nums}
+.stat:nth-child(1) b{color:var(--y)}.stat:nth-child(2) b{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat span{color:var(--mute)}
+.tabs{display:flex;gap:0;margin-top:clamp(28px,4vw,48px);margin-bottom:-1px}
+.tab{min-height:48px;padding:0 22px;border:1.5px solid var(--line);border-bottom:0;background:var(--s1);cursor:pointer;font-weight:700;color:var(--mute)}
+.tab+.tab{border-left:0}
+.tab[aria-selected=true]{background:var(--y);color:#0d0d0d;border-color:var(--y)}
+.tab b{font-family:"IBM Plex Mono",monospace;font-weight:600;margin-left:6px;opacity:.75}
+
+main.band{padding-top:28px}
 .lay{display:grid;grid-template-columns:260px minmax(0,1fr);gap:32px;align-items:start}
-aside{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto;padding-right:4px}
-fieldset{border:0;margin:0 0 20px;padding:0}
-legend{font-weight:700;font-size:14px;margin-bottom:8px}
-.search{width:100%;min-height:44px;font-size:16px;padding:0 12px;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+aside{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto;padding:4px 6px 8px 2px}
+fieldset{border:0;margin:0 0 22px;padding:0}
+legend{margin-bottom:10px;color:var(--mute)}
+.search{width:100%;min-height:48px;font-size:16px;padding:0 14px;border:1.5px solid var(--line);border-radius:0;background:var(--s1)}
+.search:focus{border-color:var(--y);outline:0}
 .opt{display:flex;align-items:center;gap:10px;min-height:34px;font-size:15px;cursor:pointer}
-.opt input{width:18px;height:18px;accent-color:var(--red);margin:0}
-.opt span{flex:1}.opt em{font-style:normal;color:var(--mute);font-size:13px;font-variant-numeric:tabular-nums}
-.bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
-.count{color:var(--mute)}.count b{color:var(--ink)}
-.sel{min-height:44px;padding:0 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);font-size:16px}
-.filt{display:none}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
-.card{border:1px solid var(--line);border-radius:10px;background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
-.pic{position:relative;aspect-ratio:16/10;background:var(--sheet);border-bottom:1px solid var(--line);
-background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:20px 20px;background-position:-1px -1px}
+.opt input{appearance:none;width:18px;height:18px;border:1.5px solid var(--mute);border-radius:0;margin:0;display:grid;place-items:center;flex:none;cursor:pointer}
+.opt input:checked{background:var(--y);border-color:var(--y);box-shadow:2px 2px 0 var(--yR)}
+.opt input:checked::after{content:"";width:9px;height:5px;border:2.5px solid #0d0d0d;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.opt span{flex:1}.opt em{font:600 12px "IBM Plex Mono",monospace;font-style:normal;color:var(--mute)}
+.fav-opt{padding:10px 12px;border:1.5px solid var(--line);background:var(--s1)}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.count{color:var(--mute)}.count b{color:var(--ink);font-weight:800}
+.sel{min-height:44px;padding:0 12px;border:1.5px solid var(--line);border-radius:0;background:var(--s1);font-size:16px}
+.filt{display:none!important}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px}
+.card{position:relative;border:1.5px solid var(--line);background:var(--s1);display:flex;flex-direction:column;transition:transform .12s,box-shadow .12s,border-color .12s}
+.card:hover{transform:translate(-3px,-3px);border-color:var(--cardEdge);box-shadow:6px 6px 0 var(--cardEdge)}
+.pic{position:relative;aspect-ratio:16/10;background:var(--bg);border-bottom:1.5px solid var(--line);
+ background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:20px 20px}
 .pic svg{position:absolute;inset:12% 18%;width:64%;height:76%}
-.pno{position:absolute;left:10px;bottom:8px;font-size:12px;color:var(--mute);background:var(--sheet);padding:0 4px;font-variant-numeric:tabular-nums}
-.fav{position:absolute;right:8px;top:8px;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--bg);cursor:pointer;display:grid;place-items:center}
+.pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#fff}
+.pic.has>svg{display:none}
+.pic.has .pno{background:var(--bg);padding:1px 5px;z-index:1}
+.pno{position:absolute;left:10px;bottom:8px;font:600 11px "IBM Plex Mono",monospace;color:var(--mute);letter-spacing:.06em}
+.fav{position:absolute;right:10px;top:10px;width:40px;height:40px;border:1.5px solid var(--line);background:var(--s1);cursor:pointer;display:grid;place-items:center;border-radius:0}
 .fav svg{position:static;width:18px;height:18px}
-.fav[aria-pressed=true] path{fill:var(--red);stroke:var(--red)}
-.body{padding:14px 14px 12px;display:flex;flex-direction:column;gap:10px;flex:1}
-.card h3{margin:0;font-size:16px;line-height:1.3;font-weight:700;overflow-wrap:anywhere}
+.fav[aria-pressed=true]{border-color:var(--o3)}.fav[aria-pressed=true] path{fill:var(--o3);stroke:var(--o3)}
+.body{padding:16px 16px 14px;display:flex;flex-direction:column;gap:10px;flex:1}
+.card h3{margin:0;font-size:17px;line-height:1.25;font-weight:700;overflow-wrap:anywhere}
 .tags{display:flex;flex-wrap:wrap;gap:6px}
-.tg{font-size:13px;padding:2px 8px;border-radius:4px;background:var(--chip);white-space:nowrap}
-.tg.s{background:transparent;border:1px solid var(--line)}
-.tg.p{background:var(--ink);color:var(--bg)}
+.tg{font:600 11px "IBM Plex Mono",monospace;letter-spacing:.04em;text-transform:uppercase;padding:4px 7px;border:1px solid var(--line);white-space:nowrap}
+.tg.p{background:var(--y);color:#0d0d0d;border-color:var(--y)}
+.tg.s{color:var(--o2);border-color:color-mix(in srgb,var(--o2) 45%,transparent)}
 .more{color:var(--mute);font-size:13px}
-.foot{margin-top:auto;display:flex;justify-content:space-between;align-items:center;gap:8px;padding-top:4px}
-.plat{font-size:13px;color:var(--mute);display:flex;align-items:center;gap:6px}
-.plat i{width:8px;height:8px;border-radius:50%;display:inline-block}
-.go{min-height:40px;padding:0 14px;border-radius:6px;background:var(--red);color:var(--redink);font-weight:600;font-size:14px;text-decoration:none;display:inline-flex;align-items:center;white-space:nowrap}
-.res .pic{aspect-ratio:auto;height:64px;background-image:none}
-.res .dom{font-size:13px;color:var(--mute);overflow-wrap:anywhere}
-.empty{padding:48px 16px;text-align:center;color:var(--mute);border:1px dashed var(--line);border-radius:10px}
-footer.band{border-top:1px solid var(--line);color:var(--mute);font-size:14px;background:var(--sheet)}
-footer p{margin:4px 0;max-width:80ch}
-dialog{border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);padding:24px;width:min(560px,94vw)}
-dialog::backdrop{background:rgb(0 0 0/.45)}
-dialog h2{margin:0 0 4px;font-size:22px}
-dialog label{display:block;font-size:14px;font-weight:600;margin:12px 0 4px}
-dialog input,dialog select{width:100%;min-height:44px;font-size:16px;padding:0 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+.foot{margin-top:auto;display:flex;justify-content:space-between;align-items:center;gap:8px;padding-top:6px}
+.plat{font:600 12px "IBM Plex Mono",monospace;color:var(--mute);display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.04em}
+.plat i{width:8px;height:8px;display:inline-block}
+.go{--d:4px;min-height:40px;padding:0 14px;font-size:14px}
+.res .pic{aspect-ratio:auto;height:56px}
+.res .dom{font:500 13px "IBM Plex Mono",monospace;color:var(--mute);overflow-wrap:anywhere}
+.empty{padding:48px 16px;text-align:center;color:var(--mute);border:1.5px dashed var(--line);display:grid;gap:16px;justify-items:center}
+footer{border-top:1.5px solid var(--line);background:var(--s1)}
+.fgrid{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:end}
+footer p{margin:6px 0;color:var(--mute);max-width:72ch;font-size:15px}
+footer .lock{margin-bottom:12px}
+dialog{border:1.5px solid var(--ink);border-radius:0;background:var(--s1);color:var(--ink);padding:26px;width:min(580px,94vw);box-shadow:8px 8px 0 var(--y)}
+dialog::backdrop{background:rgb(0 0 0/.7)}
+dialog h2{font-family:Fraunces,Georgia,serif;margin:0 0 6px;font-size:28px;line-height:1.1}
+dialog label{display:block;font-size:14px;font-weight:600;margin:14px 0 6px}
+dialog input,dialog select{width:100%;min-height:46px;font-size:16px;padding:0 12px;border:1.5px solid var(--line);border-radius:0;background:var(--bg)}
+dialog input:focus,dialog select:focus{border-color:var(--y);outline:0}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .cats{display:flex;flex-wrap:wrap;gap:6px}
-.cats label{margin:0;font-weight:500;font-size:13px;display:flex;gap:6px;align-items:center;padding:4px 8px;border:1px solid var(--line);border-radius:4px;cursor:pointer}
-.cats input{width:auto;min-height:0}
-pre{background:var(--sheet);border:1px solid var(--line);border-radius:6px;padding:10px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;margin:12px 0 0}
-.dact{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
-.note{font-size:13px;color:var(--mute);margin:8px 0 0}
+.cats label{margin:0;font-weight:500;font-size:13px;display:flex;gap:6px;align-items:center;padding:6px 9px;border:1.5px solid var(--line);cursor:pointer}
+.cats label:has(input:checked){border-color:var(--y);color:var(--y)}
+.cats input{width:auto;min-height:0;accent-color:#FFD60A}
+pre{background:var(--bg);border:1.5px dashed var(--line);padding:12px;white-space:pre-wrap;overflow-wrap:anywhere;font:500 13px "IBM Plex Mono",monospace;margin:14px 0 0;color:var(--y)}
+.dact{display:flex;gap:12px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+.note{font-size:14px;color:var(--mute);margin:6px 0 0}
 @media (max-width:860px){
+ .hero{grid-template-columns:minmax(0,1fr)}.art{max-width:300px;justify-self:center;order:-1}
  .lay{grid-template-columns:minmax(0,1fr)}
- aside{position:fixed;inset:0 auto 0 0;width:min(320px,88vw);max-height:none;background:var(--bg);z-index:20;padding:20px;border-right:1px solid var(--line);transform:translateX(-105%);transition:transform .2s}
- aside.open{transform:none;box-shadow:0 0 0 100vmax rgb(0 0 0/.4)}
- .filt{display:inline-flex}
+ aside{position:fixed;inset:0 auto 0 0;width:min(320px,88vw);max-height:none;background:var(--bg);z-index:20;padding:20px;border-right:1.5px solid var(--y);transform:translateX(-105%);transition:transform .2s}
+ aside.open{transform:none;box-shadow:0 0 0 100vmax rgb(0 0 0/.6)}
+ .filt{display:inline-flex!important}
 }
-@media (max-width:600px){.tb{grid-template-columns:auto minmax(0,1fr)}.acts{grid-column:1/-1;justify-content:flex-start}.grid{grid-template-columns:minmax(0,1fr)}.row{grid-template-columns:1fr}}
-@media (prefers-reduced-motion:reduce){aside{transition:none}}
+@media (max-width:600px){.stats{grid-template-columns:1fr 1fr}.stat:nth-child(2){border-right:0}.stat:nth-child(-n+2){border-bottom:1.5px solid var(--ink)}
+ .grid{grid-template-columns:minmax(0,1fr)}.row{grid-template-columns:1fr}.fgrid{grid-template-columns:1fr}.lock .word{display:none}}
+@media (prefers-reduced-motion:reduce){aside,.card,.pop{transition:none}}
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <defs>
+  <linearGradient id="cg" x1="293.924" y1="42" x2="41.924" y2="293.923" gradientUnits="userSpaceOnUse"><stop stop-color="#FFE3A3"/><stop offset=".4" stop-color="#F6A83B"/><stop offset="1" stop-color="#E8611A"/></linearGradient>
+  <symbol id="orbit" viewBox="0 0 310 301"><path fill="#C9A400" d="M94.7666 115.427C98.1204 119.013 101.698 122.862 104.555 126.37C108.959 130.75 113.534 136.107 117.546 140.874C110.661 158.461 110.744 174.688 118.351 192.035C118.805 193.062 119.249 194.095 119.684 195.13C132.883 217.383 151.391 229.204 177.748 229.315C179.573 234.813 181.182 243.782 178.327 249.175C161.291 281.368 110.62 247.041 96.8389 226.729L96.5205 226.252C96.1451 225.82 95.7799 225.379 95.4268 224.928C82.9088 208.886 73.6873 180.37 76.2656 160.145C76.1796 158.524 76.2029 156.831 76.3232 155.086C76.3748 154.338 76.4442 153.58 76.5303 152.814C76.6164 152.048 76.7193 151.273 76.8379 150.492C76.9169 149.971 77.003 149.448 77.0957 148.922C77.2812 147.869 77.4939 146.805 77.7305 145.735C77.8488 145.2 77.9724 144.663 78.1025 144.125C78.2327 143.587 78.3693 143.048 78.5107 142.507C78.8642 141.157 79.2516 139.801 79.6689 138.447C80.0028 137.363 80.3553 136.281 80.7246 135.203C81.8326 131.968 83.0897 128.773 84.4297 125.712C85.0995 124.181 85.7898 122.684 86.4932 121.232C86.9622 120.264 87.4371 119.316 87.915 118.391C89.1098 116.08 90.3249 113.916 91.5225 111.953L94.7666 115.427ZM141.856 71.4127C168.261 61.7792 195.102 63.8282 220.393 75.5358H220.394C232.487 81.8104 242.855 88.4985 250.205 100.411C263.02 121.184 255.807 143.281 239.777 159.411C235.56 132.237 222.526 115.686 197.077 105.24C173.789 98.6034 154.922 101.663 135.547 116.558C126.681 108.127 117.926 99.5796 109.286 90.9176C118.831 82.44 129.877 75.8243 141.856 71.4127Z"/><path fill="#FFD60A" d="M0.250977 0C16.7879 15.4392 34.656 29.3875 53.6475 41.6826C62.5315 47.344 70.8473 51.7042 79.5879 56.9766C74.5317 58.8995 69.5141 60.9249 64.54 63.0518L64.7939 63.3633C66.2848 65.0822 70.9144 69.1532 72.4189 70.5518C76.7611 74.5961 81.0177 78.7314 85.1855 82.9551C109.69 107.443 134.286 132.896 161.983 154.015C181.296 168.741 212.644 188.808 238.116 178.83C251.935 173.417 263.965 159.833 269.775 146.342C276.48 130.487 276.598 112.616 270.106 96.6738C262.725 78.6648 248.825 66.9375 231.243 59.5869L231.706 58.3301C265.399 73.7081 288.238 95.9303 301.825 131.021C305.035 139.314 309.697 157.708 309.243 166.519C309.388 167.502 309.496 168.569 309.573 169.688C309.599 170.06 309.621 170.439 309.64 170.822C309.772 173.506 309.747 176.42 309.638 179.169C309.591 180.347 309.529 181.495 309.457 182.582C309.409 183.306 309.357 184.004 309.303 184.665C309.135 186.879 308.909 189.084 308.626 191.278C308.531 192.01 308.431 192.74 308.323 193.469C308.216 194.197 308.102 194.925 307.982 195.651C307.802 196.741 307.608 197.827 307.399 198.91C306.982 201.076 306.508 203.228 305.979 205.365C305.89 205.721 305.8 206.077 305.709 206.433C305.435 207.498 305.147 208.56 304.845 209.617C304.744 209.97 304.642 210.322 304.538 210.674C302.878 216.299 300.824 221.801 298.393 227.139C298.241 227.472 298.087 227.805 297.933 228.138C297.313 229.467 296.669 230.785 296.003 232.093C295.836 232.419 295.668 232.746 295.499 233.071C294.99 234.048 294.468 235.019 293.934 235.982C293.755 236.303 293.576 236.624 293.395 236.943C290.859 241.42 288.041 245.751 284.952 249.909C281.511 254.556 277.775 258.934 273.778 263.021C273.415 263.392 273.049 263.761 272.682 264.128C269.741 267.062 266.663 269.842 263.462 272.459C261.861 273.768 260.23 275.036 258.569 276.263C256.079 278.103 253.522 279.849 250.905 281.499C249.597 282.324 248.273 283.124 246.936 283.9C246.044 284.418 245.145 284.925 244.241 285.42C243.789 285.668 243.335 285.913 242.88 286.155C240.148 287.608 237.361 288.961 234.525 290.211C234.053 290.419 233.579 290.625 233.104 290.827C232.153 291.232 231.197 291.626 230.236 292.008C229.275 292.39 228.309 292.76 227.338 293.118C220.054 295.807 212.49 297.832 204.734 299.144C203.701 299.318 202.663 299.481 201.623 299.63C197.89 300.176 192.925 300.681 188.114 300.873C186.243 300.948 184.395 300.975 182.651 300.938C180.909 300.902 179.27 300.803 177.817 300.624C173.159 300.928 166.087 299.857 161.476 299.018C138.451 294.906 117.023 284.471 99.5859 268.882C74.6312 246.59 59.5385 215.309 57.6191 181.902C57.6455 179.354 57.5374 175.093 58.0508 172.749L58.5801 172.904C58.3296 196.414 67.9822 221.753 81.9941 240.533C102.403 267.888 146.468 298.613 179.616 273.767C193.913 263.408 197.296 245.022 190.232 229.239C184.956 217.447 176.851 205.598 169.602 194.745C159.906 180.253 149.812 166.032 139.33 152.098C137.605 149.785 135.79 147.467 134.114 145.129C113.398 116.231 85.2704 92.3531 63.2715 64.6416C61.5959 67.5647 58.2476 75.9189 56.6465 79.5156C45.2711 57.4295 29.6581 35.2915 13.8135 16.2314C9.81457 11.4204 4.48012 4.86898 0 0.726562L0.250977 0Z"/></symbol>
+  <symbol id="comet" viewBox="41 39 254 258"><g fill="url(#cg)"><path d="M293.924 172.393C293.036 197.861 284.446 222.46 269.289 242.945C254.132 263.43 233.119 278.838 209.025 287.134C184.931 295.431 158.887 296.227 134.331 289.418C109.774 282.608 87.8602 268.513 71.48 248.992C55.0998 229.471 45.0236 205.442 42.5812 180.076C40.1387 154.711 45.4449 129.201 57.7994 106.913C70.1539 84.6254 88.9759 66.6075 111.782 55.2374C134.587 43.8673 160.304 39.6794 185.539 43.2264L180.39 79.8252C162.558 77.3203 144.385 80.281 128.27 88.3168C112.155 96.3526 98.8552 109.086 90.1258 124.836C81.3964 140.586 77.6476 158.612 79.3742 176.537C81.1008 194.461 88.2216 211.441 99.7969 225.235C111.372 239.029 126.858 248.99 144.211 253.802C161.563 258.614 179.967 258.051 196.993 252.188C214.019 246.326 228.868 235.438 239.579 220.963C250.29 206.487 256.361 189.104 256.99 171.108L293.924 172.393Z"/><path d="M117.81 210.118L227.178 79.4724C230.015 76.0858 233.56 73.3619 237.562 71.4924C241.565 69.6229 245.929 68.6531 250.347 68.6514C254.765 68.6496 259.129 69.6159 263.134 71.4822C267.138 73.3485 270.685 76.0695 273.525 79.4538C276.364 82.8382 278.428 86.8036 279.57 91.0712C280.713 95.3389 280.906 99.805 280.137 104.155C279.368 108.506 277.655 112.635 275.119 116.252C272.583 119.87 269.285 122.887 265.457 125.093L117.81 210.118Z"/><path d="M143.993 128.932L208.799 65.8056C209.46 65.1552 210.248 64.6486 211.115 64.3178C211.981 63.987 212.907 63.839 213.833 63.8833C214.759 63.9276 215.666 64.1631 216.497 64.5751C217.328 64.987 218.065 65.5665 218.661 66.277C219.257 66.9876 219.699 67.8138 219.96 68.7036C220.221 69.5935 220.295 70.5278 220.178 71.4477C220.06 72.3676 219.753 73.2532 219.277 74.0487C218.8 74.8443 218.164 75.5326 217.409 76.0704L143.993 128.932Z"/><path d="M225.473 178.987L261.727 139.868C262.375 139.168 263.164 138.613 264.043 138.241C264.922 137.869 265.87 137.688 266.824 137.711C267.778 137.734 268.716 137.96 269.576 138.374C270.436 138.788 271.198 139.38 271.811 140.111C272.424 140.842 272.875 141.695 273.132 142.614C273.39 143.533 273.449 144.496 273.306 145.439C273.163 146.383 272.82 147.285 272.301 148.085C271.782 148.886 271.098 149.567 270.295 150.083L225.473 178.987Z"/></g></symbol>
+ </defs>
+</svg>
+
 <header class="band">
  <div class="wrap">
-  <div class="tb">
-   <svg class="logo" viewBox="0 0 52 52" aria-hidden="true"><rect x="1" y="1" width="50" height="50" rx="8" fill="var(--red)"/><g fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"><path d="M26 10 40 18v16l-14 8-14-8V18z"/><path d="M12 18l14 8 14-8M26 26v16"/></g></svg>
-   <div>
-    <h1>Open CAD Library</h1>
-    <p class="sub">Public FTC &amp; FRC robot CAD shared by teams. Filter by season or mechanism, then open the files in Onshape, Fusion 360, GrabCAD or Google Drive.</p>
-   </div>
+  <div class="top">
+   <div class="lock"><svg viewBox="0 0 310 301"><use href="#orbit"/></svg><span class="word">ORBIT</span><span class="x">×</span><svg viewBox="0 0 254 258"><use href="#comet"/></svg><span class="word">COMET</span></div>
    <div class="acts">
-    <button class="btn filt" id="openFilt" type="button">Filters</button>
-    <button class="btn icon" id="theme" type="button" aria-label="Toggle dark mode" title="Toggle dark mode"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M16.5 12.2A7 7 0 0 1 7.8 3.5a7 7 0 1 0 8.7 8.7Z"/></svg></button>
-    <button class="btn pri" id="submit" type="button">Submit to library</button>
+    <button class="pop ghost filt" id="openFilt" type="button">Filters</button>
+    <button class="pop ghost sq" id="theme" type="button" aria-label="Toggle dark mode" title="Toggle dark mode"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16.5 12.2A7 7 0 0 1 7.8 3.5a7 7 0 1 0 8.7 8.7Z"/></svg></button>
+    <button class="pop" id="submit" type="button">Submit CAD</button>
    </div>
   </div>
-  <div class="tabs" role="tablist">
+  <div class="hero">
+   <div>
+    <div class="kick mono"><i></i>An Orbit × Comet initiative</div>
+    <h1>The open <em>CAD library</em> for FTC &amp; FRC.</h1>
+    <p class="lede">Public robot CAD from teams around the world, in one searchable place. Filter by season or mechanism, then open the files straight in Onshape, Fusion 360, GrabCAD or Google Drive.</p>
+    <div class="ctas"><a class="pop" href="#library">Browse the library</a><a class="pop comet" href="https://github.com/Saloom-Inc/orbit" target="_blank" rel="noopener noreferrer">Star on GitHub</a></div>
+   </div>
+   <div class="art" aria-hidden="true">
+    <div class="ring"></div><div class="ring2"></div>
+    <svg class="om" viewBox="0 0 310 301"><use href="#orbit"/></svg>
+    <svg class="cm" viewBox="0 0 254 258"><use href="#comet"/></svg>
+    <div class="xx">×</div>
+   </div>
+  </div>
+  <div class="stats">
+   <div class="stat"><b id="hs-cad">0</b><span>CAD files</span></div>
+   <div class="stat"><b id="hs-res">0</b><span>resources</span></div>
+   <div class="stat"><b id="hs-season">0</b><span>seasons</span></div>
+   <div class="stat"><b id="hs-plat">0</b><span>CAD platforms</span></div>
+  </div>
+  <div class="tabs" role="tablist" id="library">
    <button class="tab" role="tab" id="t-cad" aria-selected="true" type="button">CAD files<b id="n-cad"></b></button>
    <button class="tab" role="tab" id="t-res" aria-selected="false" type="button">Resources<b id="n-res"></b></button>
   </div>
@@ -124,13 +192,13 @@ pre{background:var(--sheet);border:1px solid var(--line);border-radius:6px;paddi
 <main class="band">
  <div class="wrap lay">
   <aside id="rail" aria-label="Filters">
-   <fieldset><label class="opt"><input type="checkbox" id="favOnly"><span>Favorites only</span></label></fieldset>
-   <fieldset><legend><label for="q">Search</label></legend><input class="search" id="q" type="search" placeholder="Robot, team number, mechanism…" autocomplete="off"></fieldset>
-   <fieldset id="f-prog"><legend>Program</legend></fieldset>
-   <fieldset id="f-season"><legend>Season</legend></fieldset>
-   <fieldset id="f-cat"><legend>Category</legend></fieldset>
-   <fieldset id="f-plat"><legend>CAD platform</legend></fieldset>
-   <button class="btn" id="reset" type="button">Clear all filters</button>
+   <fieldset><label class="opt fav-opt"><input type="checkbox" id="favOnly"><span>Favorites only</span></label></fieldset>
+   <fieldset><legend class="mono"><label for="q">Search</label></legend><input class="search" id="q" type="search" placeholder="Robot, team number, mechanism…" autocomplete="off"></fieldset>
+   <fieldset id="f-prog"><legend class="mono">Program</legend></fieldset>
+   <fieldset id="f-season"><legend class="mono">Season</legend></fieldset>
+   <fieldset id="f-cat"><legend class="mono">Category</legend></fieldset>
+   <fieldset id="f-plat"><legend class="mono">CAD platform</legend></fieldset>
+   <button class="pop ghost" id="reset" type="button">Clear all filters</button>
   </aside>
   <section aria-live="polite">
    <div class="bar">
@@ -149,16 +217,20 @@ pre{background:var(--sheet);border:1px solid var(--line);border-radius:6px;paddi
 </main>
 
 <footer class="band">
- <div class="wrap">
-  <p>Open-source and community-maintained. Every design belongs to the team that published it; this site only links to their public files.</p>
-  <p>Link index first compiled at <a href="https://www.cadbaseftc.com/">cadbaseftc.com</a> by FTC team 31071 Stratos. To add or fix an entry, use “Submit to library” and send the generated line as a pull request to <code>data/library.txt</code>.</p>
+ <div class="wrap fgrid">
+  <div>
+   <div class="lock"><svg viewBox="0 0 310 301"><use href="#orbit"/></svg><span>ORBIT</span><span class="x">×</span><svg viewBox="0 0 254 258"><use href="#comet"/></svg><span>COMET</span></div>
+   <p>An open-source initiative by FTC teams Orbit and Comet. Every design belongs to the team that published it; this site only links to their public files.</p>
+   <p>Link index first compiled at <a href="https://www.cadbaseftc.com/">cadbaseftc.com</a> by FTC team 31071 Stratos. MIT licensed: fork it, improve it, send a pull request.</p>
+  </div>
+  <a class="pop ghost" href="https://github.com/Saloom-Inc/orbit" target="_blank" rel="noopener noreferrer">View source</a>
  </div>
 </footer>
 
 <dialog id="dlg">
  <form id="sf" method="dialog">
-  <h2>Submit to library</h2>
-  <p class="note">Fill this in to generate an entry line, then add it to <code>data/library.txt</code> in a pull request.</p>
+  <h2>Submit CAD</h2>
+  <p class="note">Fill this in to generate an entry line, then add it to <code>data/library.txt</code> in a pull request on GitHub.</p>
   <label for="s-title">Title</label><input id="s-title" required placeholder="e.g. 12345 Decode Robot">
   <label for="s-url">Public CAD link</label><input id="s-url" type="url" required placeholder="https://cad.onshape.com/documents/…">
   <div class="row">
@@ -171,7 +243,7 @@ pre{background:var(--sheet);border:1px solid var(--line);border-radius:6px;paddi
   </div>
   <label>Categories (first ticked = primary)</label><div class="cats" id="s-cats"></div>
   <pre id="s-out">Fill in the title and link to see the entry.</pre>
-  <div class="dact"><button class="btn" type="button" id="s-close">Close</button><button class="btn pri" type="button" id="s-copy">Copy entry</button></div>
+  <div class="dact"><button class="pop ghost" type="button" id="s-close">Close</button><button class="pop" type="button" id="s-copy">Copy entry</button></div>
  </form>
 </dialog>
 
@@ -447,6 +519,7 @@ R|App Store - Onshape|https://cad.onshape.com/appstore/apps/Design%20&%20Documen
 R|The Loony Squad - LoonyLib|https://www.theloonysquad.com/loonylib||U||x
 R|Open Source 3D Printable Items – Ferra Components|https://ferracomponents.com/collections/open-source-3d-printable-items||U||x
 </script>
+<script id="thumbs" type="application/json">[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]</script>
 <script>
 {
 const SEASONS=[["B","Biobuzz 2026-2027"],["D","Decode 2025-2026"],["I","Into the Deep 2024-2025"],["C","Centerstage 2023-2024"],["P","Power Play 2022-2023"],["F","Freight Frenzy 2021-2022"],["S","Skystone 2019-2020"],["U","Unspecified / Offseason"]];
@@ -456,11 +529,12 @@ const SN=Object.fromEntries(SEASONS),SRANK=Object.fromEntries(SEASONS.map((s,i)=
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]);
 const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 
+let TH=[];try{TH=JSON.parse(document.getElementById('thumbs').textContent)}catch(e){}
 const ALL=document.getElementById('lib').textContent.split('\n').filter(l=>l.trim()&&!l.startsWith('#')).map((l,i)=>{
  const [k,t,u,p,s,tg,pl]=l.split('|');
  const tags=[...(tg||'')].map(c=>CATS[parseInt(c,36)]).filter(Boolean);
  const url=u.startsWith('~')?'https://cad.onshape.com/documents/'+u.slice(1):u;
- return {i,res:k==='R',title:t.replace(/¦/g,'|').trim()||'Untitled',url,prog:p||'FTC',season:s,tags,plat:pl,key:url,host:(()=>{try{return new URL(url).hostname.replace(/^www\./,'')}catch(e){return ''}})()};
+ return {i,thumb:TH[i]||null,res:k==='R',title:t.replace(/¦/g,'|').trim()||'Untitled',url,prog:p||'FTC',season:s,tags,plat:pl,key:url,host:(()=>{try{return new URL(url).hostname.replace(/^www\./,'')}catch(e){return ''}})()};
 });
 
 let st={tab:'cad',q:'',prog:new Set(),season:new Set(),cat:new Set(),plat:new Set(),fav:false,sort:'new'};
@@ -516,12 +590,12 @@ function card(o){
  const extra=o.tags.slice(1,4),rest=o.tags.length-4;
  const pno=(o.res?'R-':'P-')+String(o.i+1).padStart(3,'0');
  return `<article class="card${o.res?' res':''}">
- <div class="pic">${o.res?'':`<svg viewBox="0 0 100 90" fill="none" stroke="var(--draw)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">${draw(o)}</svg><span class="pno">${pno}</span>`}
+ <div class="pic${o.thumb?' has':''}">${o.res?'':`${o.thumb?`<img src="thumbs/${o.thumb}.webp" alt="${esc(o.title)} CAD preview" loading="lazy" decoding="async">`:''}<svg viewBox="0 0 100 90" fill="none" stroke="var(--draw)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">${draw(o)}</svg><span class="pno">${pno}</span>`}
  <button class="fav" type="button" data-fav="${esc(o.key)}" aria-pressed="${fav}" aria-label="${fav?'Remove from':'Add to'} favorites"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 17s-6.5-3.9-6.5-8.6A3.6 3.6 0 0 1 10 6a3.6 3.6 0 0 1 6.5 2.4C16.5 13.1 10 17 10 17Z"/></svg></button></div>
  <div class="body"><h3>${esc(o.title)}</h3>
  ${o.res?`<div class="dom">${esc(o.host)}</div>`:`<div class="tags"><span class="tg p">${o.prog}</span><span class="tg s">${esc(SN[o.season]||'')}</span>${o.tags[0]?`<span class="tg">${esc(o.tags[0])}</span>`:''}</div>
  ${extra.length?`<div class="more">${extra.map(esc).join(' · ')}${rest>0?` · +${rest} more`:''}</div>`:''}`}
- <div class="foot"><span class="plat"><i style="background:${pc}"></i>${pn}</span><a class="go" href="${esc(o.url)}" target="_blank" rel="noopener noreferrer">${o.res?'Open':'View CAD'}</a></div></div></article>`}
+ <div class="foot"><span class="plat"><i style="background:${pc}"></i>${pn}</span><a class="pop go" href="${esc(o.url)}" target="_blank" rel="noopener noreferrer">${o.res?'Open':'View CAD'}</a></div></div></article>`}
 
 function render(){
  const list=pool().filter(o=>match(o));
@@ -532,11 +606,13 @@ function render(){
  if(s==='za')list.sort((a,b)=>b.title.localeCompare(a.title));
  const total=pool().length,label=st.tab==='res'?'resources':'CAD files';
  document.getElementById('count').innerHTML=`<b>${list.length}</b> of ${total} ${label}`;
- document.getElementById('grid').innerHTML=list.length?list.map(card).join(''):`<div class="empty">Nothing matches these filters. <button class="btn" type="button" data-reset>Clear filters</button></div>`;
+ document.getElementById('grid').innerHTML=list.length?list.map(card).join(''):`<div class="empty">Nothing matches these filters. <button class="pop" type="button" data-reset>Clear filters</button></div>`;
  renderFacets();
 }
 
 const nCad=ALL.filter(o=>!o.res).length,nRes=ALL.length-nCad;
+const cnt=(id,n)=>{const el=document.getElementById(id);if(matchMedia('(prefers-reduced-motion: reduce)').matches){el.textContent=n;return}let t0;const f=t=>{t0??=t;const p=Math.min(1,(t-t0)/900);el.textContent=Math.round(n*(1-(1-p)**3));if(p<1)requestAnimationFrame(f)};requestAnimationFrame(f)};
+cnt('hs-cad',nCad);cnt('hs-res',nRes);cnt('hs-season',new Set(ALL.filter(o=>o.season!=='U').map(o=>o.season)).size);cnt('hs-plat',new Set(ALL.filter(o=>!o.res).map(o=>o.plat)).size);
 document.getElementById('n-cad').textContent='('+nCad+')';document.getElementById('n-res').textContent='('+nRes+')';
 
 function setTab(t){if(st.tab!==t){['prog','season','cat','plat'].forEach(k=>st[k].clear())}st.tab=t;
@@ -552,6 +628,7 @@ document.getElementById('sort').onchange=e=>{st.sort=e.target.value;store.set('o
 document.getElementById('rail').addEventListener('change',e=>{const k=e.target.dataset.k;if(!k)return;e.target.checked?st[k].add(e.target.value):st[k].delete(e.target.value);render()});
 const reset=()=>{st.q='';st.fav=false;['prog','season','cat','plat'].forEach(k=>st[k].clear());document.getElementById('q').value='';document.getElementById('favOnly').checked=false;render()};
 document.getElementById('reset').onclick=reset;
+document.getElementById('grid').addEventListener('error',e=>{if(e.target.tagName==='IMG'){const p=e.target.parentElement;e.target.remove();p.classList.remove('has')}},true);
 document.getElementById('grid').addEventListener('click',e=>{
  if(e.target.closest('[data-reset]'))return reset();
  const b=e.target.closest('[data-fav]');if(!b)return;const k=b.dataset.fav;
@@ -562,9 +639,8 @@ const rail=document.getElementById('rail');
 document.getElementById('openFilt').onclick=e=>{e.stopPropagation();rail.classList.add('open')};
 document.addEventListener('click',e=>{if(rail.classList.contains('open')&&!rail.contains(e.target))rail.classList.remove('open')});
 
-const root=document.documentElement;let th=store.get('ocl-theme',null);if(th)root.dataset.theme=th;
-document.getElementById('theme').onclick=()=>{const dark=root.dataset.theme?root.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
- root.dataset.theme=dark?'light':'dark';store.set('ocl-theme',root.dataset.theme)};
+const root=document.documentElement;root.dataset.theme=store.get('ocl-theme','dark');
+document.getElementById('theme').onclick=()=>{root.dataset.theme=root.dataset.theme==='dark'?'light':'dark';store.set('ocl-theme',root.dataset.theme)};
 
 /* submit dialog */
 const dlg=document.getElementById('dlg');
